@@ -1,20 +1,20 @@
 use std::{error::Error, fs};
 
-fn read_words() -> Result<String, std::io::Error> {
-    fs::read_to_string("./words.txt")
+fn read_words() -> Result<Vec<String>, std::io::Error> {
+    let text = fs::read_to_string("./words.txt")?;
+    let vec: Vec<String> = text.lines().map(|w| w.to_string()).collect();
+    Ok(vec)
 }
 
-fn find_n_length_words(n: usize) -> Result<Vec<String>, Box<dyn Error>> {
-    let words = read_words()?;
-
+fn find_n_length_words(words: &Vec<String>, n: usize) -> Vec<String> {
     let mut output = Vec::new();
 
-    for word in words.lines() {
+    for word in words.iter() {
         if word.chars().count() == n {
             output.push(word.to_string())
         }
     }
-    Ok(output)
+    output
 }
 
 #[cfg(test)]
@@ -22,9 +22,15 @@ mod tests {
     use super::*;
 
     #[test]
-    fn find_length_12_words() {
-        let words = find_n_length_words(12).unwrap();
-        for word in &words {
+    fn find_lengthed_words() {
+        let words: Vec<String> = read_words().unwrap();
+
+        let twelve_length_words = find_n_length_words(&words, 12);
+        for word in twelve_length_words.iter() {
+            println!("{}", word)
+        }
+        let fifteen_length_words = find_n_length_words(&words, 15);
+        for word in fifteen_length_words.iter() {
             println!("{}", word)
         }
     }
