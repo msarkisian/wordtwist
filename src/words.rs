@@ -4,7 +4,7 @@ use std::fs;
 /// Reads the result of `words.txt` into a `Result<Vec<String>>` of its contents
 pub fn read_words() -> Result<Vec<String>, std::io::Error> {
     let text = fs::read_to_string("./words.txt")?;
-    let vec: Vec<String> = text.lines().map(|w| w.to_string()).collect();
+    let vec: Vec<String> = text.lines().map(|w| w.to_lowercase()).collect();
     Ok(vec)
 }
 
@@ -78,6 +78,6 @@ mod tests {
         let filtered_four_length_words = filter_words_by_character(&four_length_words, &chars);
 
         println!("{:?}", filtered_four_length_words);
-        assert_eq!(filtered_four_length_words, vec!["rust", "ruts"]);
+        assert_eq!(filtered_four_length_words, vec!["russ", "rust", "ruts"]);
     }
 }
