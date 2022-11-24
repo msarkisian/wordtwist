@@ -37,6 +37,13 @@ pub fn get_random_letter() -> char {
     ('a'..'z').choose(&mut thread_rng()).unwrap()
 }
 
+pub fn get_random_n_length_word(n: usize) -> String {
+    let words = read_words().unwrap();
+    get_random_word(&get_all_n_length_words(&words, n))
+        .expect("Requested word of nonexistant size!")
+        .clone()
+}
+
 /// Given `words` and `characters`, returns a new vector of only words solely comprised of
 /// those characters
 ///
