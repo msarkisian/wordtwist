@@ -1,12 +1,18 @@
 use rand::{seq::SliceRandom, thread_rng};
 use std::fs;
 
+/// Reads the result of `words.txt` into a `Result<Vec<String>>` of its contents
 pub fn read_words() -> Result<Vec<String>, std::io::Error> {
     let text = fs::read_to_string("./words.txt")?;
     let vec: Vec<String> = text.lines().map(|w| w.to_string()).collect();
     Ok(vec)
 }
 
+/// Provided a reference of `words`, and a size `n`, returns a vector of all words of
+/// that size.
+///
+/// Words is passed as an argument to prevent having to reread the file, this could
+/// be refactored later.
 pub fn get_all_n_length_words(words: &Vec<String>, n: usize) -> Vec<String> {
     let mut output = Vec::new();
 
@@ -18,6 +24,7 @@ pub fn get_all_n_length_words(words: &Vec<String>, n: usize) -> Vec<String> {
     output
 }
 
+/// Given a vector of `words`, randomly selects one.
 pub fn get_random_word(words: &Vec<String>) -> Option<&String> {
     words.choose(&mut thread_rng())
 }
