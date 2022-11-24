@@ -1,6 +1,9 @@
-use rand::{seq::IteratorRandom, thread_rng};
+use rand::{
+    seq::{IteratorRandom, SliceRandom},
+    thread_rng,
+};
 
-use crate::words::get_random_n_length_word;
+use crate::words::{get_random_letter, get_random_n_length_word};
 
 enum GameDirections {
     Up,
@@ -22,7 +25,7 @@ impl<const N: usize> GeneratedGame<N> {
     pub fn new() -> Self {
         fn calculate_valid_directions<const N: usize>(
             grid: &[[char; N]; N],
-            (x, y): &(usize, usize),
+            (y, x): &(usize, usize),
         ) -> Vec<GameDirections> {
             let mut output = Vec::new();
 
@@ -59,12 +62,39 @@ impl<const N: usize> GeneratedGame<N> {
             .unwrap();
         let target_word = get_random_n_length_word(target_word_size);
 
-        let mut grid = [['0'; N]; N];
-        loop {
+        let target_word_grid = loop {
+            let mut grid = [['0'; N]; N];
             let start_point = (
-                (0..N).into_iter().choose(&mut thread_rng()),
-                (0..N).into_iter().choose(&mut thread_rng()),
+                (0..N).into_iter().choose(&mut thread_rng()).unwrap(),
+                (0..N).into_iter().choose(&mut thread_rng()).unwrap(),
             );
+            let mut point = start_point;
+
+            for character in target_word.chars() {
+                grid[point.0][point.1] = character;
+                match calculate_valid_directions(&grid, &point)
+                    .choose(&mut thread_rng())
+                    .unwrap()
+                    // Will panic if it gets boxed in
+                    // TODO: FIX
+                {
+                    GameDirections::Up => point = (point.0, point.1 - 1),
+                    GameDirections::UpLeft => point = (point.0 - 1, point.1 - 1),
+                    GameDirections::UpRight => point = (point.0 + 1, point.1 - 1),
+                    GameDirections::Down => point = (point.0, point.1 + 1),
+                    GameDirections::DownLeft => point = (point.0 - 1, point.1 + 1),
+                    GameDirections::DownRight => point = (point.0 + 1, point.1 + 1),
+                    GameDirections::Left => point = (point.0 - 1, point.1),
+                    GameDirections::Right => point = (point.0 + 1, point.1),
+                }
+            }
+            break grid;
+        };
+        // TODO add random characters in remaining space
+
+        GeneratedGame {
+            grid: target_word_grid,
+            valid_words: vec![String::from("todo")],
         }
     }
 }
