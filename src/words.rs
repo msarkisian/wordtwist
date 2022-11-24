@@ -1,4 +1,7 @@
-use rand::{seq::SliceRandom, thread_rng};
+use rand::{
+    seq::{IteratorRandom, SliceRandom},
+    thread_rng,
+};
 use std::fs;
 
 /// Reads the result of `words.txt` into a `Result<Vec<String>>` of its contents
@@ -27,6 +30,11 @@ pub fn get_all_n_length_words(words: &Vec<String>, n: usize) -> Vec<String> {
 /// Given a vector of `words`, randomly selects one.
 pub fn get_random_word(words: &Vec<String>) -> Option<&String> {
     words.choose(&mut thread_rng())
+}
+
+/// Generates a random letter
+pub fn get_random_letter() -> char {
+    ('a'..'z').choose(&mut thread_rng()).unwrap()
 }
 
 /// Given `words` and `characters`, returns a new vector of only words solely comprised of
@@ -79,5 +87,10 @@ mod tests {
 
         println!("{:?}", filtered_four_length_words);
         assert_eq!(filtered_four_length_words, vec!["russ", "rust", "ruts"]);
+    }
+
+    #[test]
+    fn test_random_letter() {
+        get_random_letter();
     }
 }
