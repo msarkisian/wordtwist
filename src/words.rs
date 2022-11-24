@@ -29,6 +29,19 @@ pub fn get_random_word(words: &Vec<String>) -> Option<&String> {
     words.choose(&mut thread_rng())
 }
 
+/// Given `words` and `characters`, returns a new vector of only words solely comprised of
+/// those characters
+///
+/// Hopefully, this means that when we need to search for permutations of words, this makes
+/// it significantly cheaper
+fn filter_words_by_character(words: &Vec<String>, characters: &[char]) -> Vec<String> {
+    words
+        .clone()
+        .into_iter()
+        .filter(|w| w.chars().all(|c| characters.contains(&c)))
+        .collect()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -54,5 +67,17 @@ mod tests {
         let random_twelve_length_word = get_random_word(&twelve_length_words);
 
         assert_eq!(random_twelve_length_word.unwrap().chars().count(), 12);
+    }
+
+    #[test]
+    fn test_filter_words_by_characters() {
+        let words: Vec<String> = read_words().unwrap();
+        let four_length_words = get_all_n_length_words(&words, 4);
+        let chars = ['r', 'u', 's', 't'];
+
+        let filtered_four_length_words = filter_words_by_character(&four_length_words, &chars);
+
+        println!("{:?}", filtered_four_length_words);
+        assert_eq!(filtered_four_length_words, vec!["rust", "ruts"]);
     }
 }
