@@ -64,7 +64,7 @@ impl<const N: usize> GeneratedGame<N> {
         let target_word = get_random_n_length_word(target_word_size);
         println!("Target word: {}", target_word);
 
-        let mut grid = loop {
+        let mut grid = 'outer: loop {
             let mut grid = [['0'; N]; N];
             let start_point = (
                 (0..N).into_iter().choose(&mut thread_rng()).unwrap(),
@@ -75,7 +75,7 @@ impl<const N: usize> GeneratedGame<N> {
             for character in target_word.chars() {
                 grid[point.0][point.1] = character;
                 match calculate_valid_directions(&grid, &point).choose(&mut thread_rng()) {
-                    None => continue,
+                    None => continue 'outer,
                     Some(GameDirections::Up) => point = (point.0 - 1, point.1),
                     Some(GameDirections::UpLeft) => point = (point.0 - 1, point.1 - 1),
                     Some(GameDirections::UpRight) => point = (point.0 - 1, point.1 + 1),
