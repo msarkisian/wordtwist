@@ -102,6 +102,14 @@ impl<const N: usize> GeneratedGame<N> {
             valid_words: vec![String::from("todo")],
         }
     }
+
+    pub fn grid(&self) -> &[[char; N]; N] {
+        &self.grid
+    }
+
+    pub fn valid_words(&self) -> &Vec<String> {
+        &self.valid_words
+    }
 }
 
 #[cfg(test)]
