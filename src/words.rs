@@ -37,6 +37,7 @@ pub fn get_random_letter() -> char {
     ('a'..'z').choose(&mut thread_rng()).unwrap()
 }
 
+/// Generates a random word of length `n`, from the wordlist
 pub fn get_random_n_length_word(n: usize) -> String {
     let words = read_words().unwrap();
     get_random_word(&get_all_n_length_words(&words, n))
