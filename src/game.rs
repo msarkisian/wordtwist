@@ -22,6 +22,12 @@ pub struct GeneratedGame<const N: usize> {
     valid_words: Vec<String>,
 }
 
+impl<const N: usize> Default for GeneratedGame<N> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl<const N: usize> GeneratedGame<N> {
     pub fn new() -> Self {
         fn calculate_valid_directions<const N: usize>(
