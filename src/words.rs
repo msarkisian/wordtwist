@@ -5,7 +5,7 @@ use rand::{
 use std::fs;
 
 /// Reads the result of `words.txt` into a `Result<Vec<String>>` of its contents
-pub fn read_words() -> Result<Vec<String>, std::io::Error> {
+fn read_words() -> Result<Vec<String>, std::io::Error> {
     let text = fs::read_to_string("./words.txt")?;
     let vec: Vec<String> = text.lines().map(|w| w.to_lowercase()).collect();
     Ok(vec)
@@ -16,7 +16,7 @@ pub fn read_words() -> Result<Vec<String>, std::io::Error> {
 ///
 /// Words is passed as an argument to prevent having to reread the file, this could
 /// be refactored later.
-pub fn get_all_n_length_words(words: &Vec<String>, n: usize) -> Vec<String> {
+fn get_all_n_length_words(words: &Vec<String>, n: usize) -> Vec<String> {
     let mut output = Vec::new();
 
     for word in words.iter() {
@@ -50,12 +50,121 @@ pub fn get_random_n_length_word(n: usize) -> String {
 ///
 /// Hopefully, this means that when we need to search for permutations of words, this makes
 /// it significantly cheaper
-fn filter_words_by_character(words: &Vec<String>, characters: &[char]) -> Vec<String> {
-    words
+fn filter_words_by_character(characters: &[char]) -> Vec<String> {
+    read_words()
+        .unwrap()
         .clone()
         .into_iter()
         .filter(|w| w.chars().all(|c| characters.contains(&c)))
         .collect()
+}
+
+/// Given a game `&grid`, returns a vector of all the words that can be found inside that grid.
+pub fn generate_wordlist_from_game<const N: usize>(grid: &[[char; N]; N]) -> Vec<String> {
+    /// Recursive helper function to search for the remaining `word` slice in the `grid`.
+    fn search_for_word<const N: usize>(
+        grid: &[[char; N]; N],
+        word: &str,
+        (y, x): (usize, usize),
+        visited_squares: &mut [[bool; N]; N],
+    ) -> bool {
+        visited_squares[y][x] = true;
+
+        let next_char = match word.chars().next() {
+            None => return true,
+            Some(char) => char,
+        };
+
+        // up
+        if y > 0 && grid[y - 1][x] == next_char && visited_squares[y - 1][x] != true {
+            if search_for_word(&grid, &word[1..], (y - 1, x), visited_squares) {
+                return true;
+            }
+        }
+        // up left
+        if y > 0
+            && x > 0
+            && grid[y - 1][x - 1] == next_char
+            && visited_squares[y - 1][x - 1] != true
+        {
+            if search_for_word(&grid, &word[1..], (y - 1, x - 1), visited_squares) {
+                return true;
+            }
+        }
+        // up right
+        if y > 0
+            && x < N - 2
+            && grid[y - 1][x + 1] == next_char
+            && visited_squares[y - 1][x + 1] != true
+        {
+            if search_for_word(&grid, &word[1..], (y - 1, x + 1), visited_squares) {
+                return true;
+            }
+        }
+        // down
+        if y < N - 2 && grid[y + 1][x] == next_char && visited_squares[y + 1][x] != true {
+            if search_for_word(&grid, &word[1..], (y + 1, x), visited_squares) {
+                return true;
+            }
+        }
+        // down left
+        if y < N - 2
+            && x > 0
+            && grid[y + 1][x - 1] == next_char
+            && visited_squares[y + 1][x - 1] != true
+        {
+            if search_for_word(&grid, &word[1..], (y + 1, x - 1), visited_squares) {
+                return true;
+            }
+        }
+        // down right
+        if y < N - 2
+            && x < N - 2
+            && grid[y + 1][x + 1] == next_char
+            && visited_squares[y + 1][x + 1] != true
+        {
+            if search_for_word(&grid, &word[1..], (y + 1, x + 1), visited_squares) {
+                return true;
+            }
+        }
+        // left
+        if x > 0 && grid[y][x - 1] == next_char && visited_squares[y][x - 1] != true {
+            if search_for_word(&grid, &word[1..], (y, x - 1), visited_squares) {
+                return true;
+            }
+        }
+        // right
+        if x < N - 2 && grid[y][x + 1] == next_char && visited_squares[y][x + 1] != true {
+            if search_for_word(&grid, &word[1..], (y, x + 1), visited_squares) {
+                return true;
+            }
+        }
+        false
+    }
+
+    let mut letters = grid.clone().into_iter().flatten().collect::<Vec<_>>();
+    letters.sort();
+    letters.dedup();
+
+    let possible_words = filter_words_by_character(&letters);
+    let mut wordlist: Vec<String> = Vec::new();
+
+    'words: for word in possible_words {
+        let first_char = word.chars().next().unwrap();
+
+        for (y, row) in grid.iter().enumerate() {
+            for (x, grid_character) in row.iter().enumerate() {
+                if *grid_character == first_char {
+                    let mut visited_squares = [[false; N]; N];
+                    if search_for_word(&grid, &word[1..], (y, x), &mut visited_squares) {
+                        wordlist.push(word);
+                        continue 'words;
+                    }
+                }
+            }
+        }
+    }
+    wordlist
 }
 
 #[cfg(test)]
@@ -83,18 +192,6 @@ mod tests {
         let random_twelve_length_word = get_random_word(&twelve_length_words);
 
         assert_eq!(random_twelve_length_word.unwrap().chars().count(), 12);
-    }
-
-    #[test]
-    fn test_filter_words_by_characters() {
-        let words: Vec<String> = read_words().unwrap();
-        let four_length_words = get_all_n_length_words(&words, 4);
-        let chars = ['r', 'u', 's', 't'];
-
-        let filtered_four_length_words = filter_words_by_character(&four_length_words, &chars);
-
-        println!("{:?}", filtered_four_length_words);
-        assert_eq!(filtered_four_length_words, vec!["russ", "rust", "ruts"]);
     }
 
     #[test]

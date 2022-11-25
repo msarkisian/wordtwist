@@ -3,9 +3,9 @@ use rand::{
     thread_rng,
 };
 
-use crate::words::{get_random_letter, get_random_n_length_word};
+use crate::words::{generate_wordlist_from_game, get_random_letter, get_random_n_length_word};
 
-enum GameDirections {
+pub enum GameDirections {
     Up,
     Down,
     Left,
@@ -95,11 +95,9 @@ impl<const N: usize> GeneratedGame<N> {
             }
         }
 
-        // TODO: generate valid words from board
-
         GeneratedGame {
             grid,
-            valid_words: vec![String::from("todo")],
+            valid_words: generate_wordlist_from_game(&grid),
         }
     }
 
@@ -122,6 +120,5 @@ mod tests {
         let _y = GeneratedGame::<4>::new();
         println!("{:?}", GeneratedGame::<5>::new());
         println!("{:?}", GeneratedGame::<4>::new());
-        panic!();
     }
 }

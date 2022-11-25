@@ -1,3 +1,5 @@
+use wordtwist::game::GeneratedGame;
+
 fn main() {
-    println!("Hello, world!");
+    println!("{:?}", GeneratedGame::<5>::new())
 }
