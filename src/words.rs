@@ -55,9 +55,13 @@ pub fn get_random_n_length_word(n: usize) -> String {
 /// it significantly cheaper
 fn filter_words_by_character(characters: &[char]) -> Vec<String> {
     WORDS
-        .clone()
-        .into_iter()
-        .filter(|w| w.chars().all(|c| characters.contains(&c)))
+        .iter()
+        .filter_map(|w| {
+            if w.chars().all(|c| characters.contains(&c)) {
+                return Some(w.to_string());
+            }
+            None
+        })
         .collect()
 }
 
