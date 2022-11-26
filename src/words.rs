@@ -5,14 +5,15 @@ use rand::{
 use std::fs;
 
 lazy_static! {
-    static ref WORDS: Vec<String> = read_words().unwrap();
+    static ref WORDS: Vec<String> = read_words();
 }
 
 /// Reads the result of `words.txt` into a `Result<Vec<String>>` of its contents
-fn read_words() -> Result<Vec<String>, std::io::Error> {
-    let text = fs::read_to_string("./words.txt")?;
-    let vec: Vec<String> = text.lines().map(|w| w.to_lowercase()).collect();
-    Ok(vec)
+fn read_words() -> Vec<String> {
+    let text = fs::read_to_string("./words.txt").expect(
+        "Wordlist not found! Please place a `words.txt` wordlist file in the root directory.",
+    );
+    text.lines().map(|w| w.to_lowercase()).collect()
 }
 
 /// Provided a reference of `words`, and a size `n`, returns a vector of all words of
