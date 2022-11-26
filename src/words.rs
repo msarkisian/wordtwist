@@ -4,6 +4,10 @@ use rand::{
 };
 use std::fs;
 
+lazy_static! {
+    static ref WORDS: Vec<String> = read_words().unwrap();
+}
+
 /// Reads the result of `words.txt` into a `Result<Vec<String>>` of its contents
 fn read_words() -> Result<Vec<String>, std::io::Error> {
     let text = fs::read_to_string("./words.txt")?;
@@ -16,10 +20,10 @@ fn read_words() -> Result<Vec<String>, std::io::Error> {
 ///
 /// Words is passed as an argument to prevent having to reread the file, this could
 /// be refactored later.
-fn get_all_n_length_words(words: &[String], n: usize) -> Vec<String> {
+fn get_all_n_length_words(n: usize) -> Vec<String> {
     let mut output = Vec::new();
 
-    for word in words.iter() {
+    for word in WORDS.iter() {
         if word.chars().count() == n {
             output.push(word.to_string())
         }
@@ -39,8 +43,7 @@ pub fn get_random_letter() -> char {
 
 /// Generates a random word of length `n`, from the wordlist
 pub fn get_random_n_length_word(n: usize) -> String {
-    let words = read_words().unwrap();
-    get_random_word(&get_all_n_length_words(&words, n))
+    get_random_word(&get_all_n_length_words(n))
         .expect("Requested word of nonexistant size!")
         .clone()
 }
@@ -51,8 +54,8 @@ pub fn get_random_n_length_word(n: usize) -> String {
 /// Hopefully, this means that when we need to search for permutations of words, this makes
 /// it significantly cheaper
 fn filter_words_by_character(characters: &[char]) -> Vec<String> {
-    read_words()
-        .unwrap()
+    WORDS
+        .clone()
         .into_iter()
         .filter(|w| w.chars().all(|c| characters.contains(&c)))
         .collect()
@@ -176,13 +179,11 @@ mod tests {
 
     #[test]
     fn find_lengthed_words() {
-        let words: Vec<String> = read_words().unwrap();
-
-        let twelve_length_words = get_all_n_length_words(&words, 12);
+        let twelve_length_words = get_all_n_length_words(12);
         for _word in twelve_length_words.iter() {
             // println!("{}", word)
         }
-        let fifteen_length_words = get_all_n_length_words(&words, 15);
+        let fifteen_length_words = get_all_n_length_words(15);
         for _word in fifteen_length_words.iter() {
             // println!("{}", word)
         }
@@ -190,8 +191,7 @@ mod tests {
 
     #[test]
     fn get_random_n_length_word() {
-        let words: Vec<String> = read_words().unwrap();
-        let twelve_length_words = get_all_n_length_words(&words, 12);
+        let twelve_length_words = get_all_n_length_words(12);
         let random_twelve_length_word = get_random_word(&twelve_length_words);
 
         assert_eq!(random_twelve_length_word.unwrap().chars().count(), 12);
