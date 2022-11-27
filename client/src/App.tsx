@@ -1,23 +1,7 @@
-function App() {
-  const dummyGrid = [
-    ['f', 'e', 'b', 'r', 'n'],
-    ['n', 'o', 'e', 'b', 'h'],
-    ['n', 'v', 'r', 'e', 'g'],
-    ['t', 'e', 'm', 'c', 'b'],
-    ['r', 'f', 'y', 'l', 'v'],
-  ];
+import { GameBoard } from './components/gameboard/GameBoard';
 
-  return (
-    <div
-      id="gameGrid"
-      style={{
-        display: 'grid',
-        gridTemplateColumns: '1fr '.repeat(dummyGrid.length),
-      }}
-    >
-      {dummyGrid.map((row) => row.map((column) => <div>{column}</div>))}
-    </div>
-  );
+function App() {
+  return <GameBoard />;
 }
 
 export default App;
