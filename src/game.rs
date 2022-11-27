@@ -68,7 +68,6 @@ impl<const N: usize> GeneratedGame<N> {
             .choose(&mut thread_rng())
             .unwrap();
         let target_word = get_random_n_length_word(target_word_size);
-        println!("Target word: {}", target_word);
 
         let mut grid = 'outer: loop {
             let mut grid = [['0'; N]; N];

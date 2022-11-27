@@ -150,6 +150,7 @@ pub fn generate_wordlist_from_game<const N: usize>(grid: &[[char; N]; N]) -> Vec
         {
             return true;
         }
+        visited_squares[y][x] = false;
         false
     }
 
