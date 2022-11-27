@@ -11,7 +11,7 @@ lazy_static! {
 /// Reads the result of `words.txt` into a `Result<Vec<String>>` of its contents
 fn read_words() -> Vec<String> {
     let text = fs::read_to_string("./words.txt").expect(
-        "Wordlist not found! Please place a `words.txt` wordlist file in the root directory.",
+        "Wordlist not found! Please place a `words.txt` wordlist file in the crate directory.",
     );
     text.lines().map(|w| w.to_lowercase()).collect()
 }
