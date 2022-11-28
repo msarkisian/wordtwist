@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Letter } from './Letter';
 import './GameBoard.css';
 import { GameGrid } from '../../@types';
@@ -14,10 +14,36 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
     null
   );
   const [selectedWord, setSelectedWord] = useState('');
+  // this is NOT to be set on mousedown, only on mouseover
+  // this is to allow backtracking to remove letters from the selection
+  const [lastLetter, setLastLetter] = useState<[number | null, number | null]>([
+    null,
+    null,
+  ]);
 
   const handleMouseDown = (y: number, x: number) => {
-    console.log(y, x);
+    if (!grid) return;
+    if (!selectedLetters) return;
+    setSelectedWord(grid[y][x]);
+    setSelectedLetters((arr) => {
+      if (!arr) return null;
+      const copy = arr.map((a) => a.slice());
+      copy[y][x] = true;
+      return copy;
+    });
   };
+  const handleMouseOver = (y: number, x: number) => {
+    if (!selectedWord) return;
+  };
+  const handleMouseUp = () => {
+    setSelectedWord('');
+    setSelectedLetters(Array(5).fill(Array(5).fill(false)));
+    setLastLetter([null, null]);
+  };
+
+  useEffect(() => {
+    window.addEventListener('mouseup', handleMouseUp);
+  }, []);
 
   const dummyGrid = [
     ['f', 'e', 'b', 'r', 'n'],
@@ -50,12 +76,15 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
       {grid.map((row, y) =>
         row.map((column, x) => (
           <Letter
+            key={`${x},${y}`}
             letter={column}
             selected={selectedLetters![y][x]}
             handleMouseDown={() => handleMouseDown(y, x)}
+            handleMouseOver={() => handleMouseOver(y, x)}
           />
         ))
       )}
+      <div>selected word: {selectedWord}</div>
     </div>
   );
 };
