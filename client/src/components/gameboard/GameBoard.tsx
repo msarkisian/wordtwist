@@ -14,31 +14,57 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
     null
   );
   const [selectedWord, setSelectedWord] = useState('');
-  // this is NOT to be set on mousedown, only on mouseover
   // this is to allow backtracking to remove letters from the selection
-  const [lastLetter, setLastLetter] = useState<[number | null, number | null]>([
-    null,
-    null,
-  ]);
+  const [letterPath, setLetterPath] = useState<[number, number][]>([]);
 
   const handleMouseDown = (y: number, x: number) => {
     if (!grid) return;
     if (!selectedLetters) return;
     setSelectedWord(grid[y][x]);
     setSelectedLetters((arr) => {
-      if (!arr) return null;
-      const copy = arr.map((a) => a.slice());
+      const copy = arr!.map((a) => a.slice());
       copy[y][x] = true;
       return copy;
     });
+    setLetterPath([...letterPath, [y, x]]);
   };
+
   const handleMouseOver = (y: number, x: number) => {
     if (!selectedWord) return;
+    const [lastY, lastX] = letterPath[letterPath.length - 1];
+    // return if they're trying to add a letter not adjacent to their last letter
+    if (Math.abs(lastY - y) > 1 || Math.abs(lastX - x) > 1) return;
+    if (
+      letterPath[letterPath.length - 2] &&
+      letterPath[letterPath.length - 2][0] === y &&
+      letterPath[letterPath.length - 2][1] === x
+    ) {
+      // backtrack
+      setSelectedWord(selectedWord.slice(0, selectedWord.length - 1));
+      setSelectedLetters((arr) => {
+        if (!arr) return null;
+        const copy = arr.map((a) => a.slice());
+        copy[lastY][lastX] = false;
+        return copy;
+      });
+      setLetterPath(letterPath.slice(0, letterPath.length - 1));
+    } else {
+      // new letter
+      if (selectedLetters![y][x]) return;
+      setSelectedWord(selectedWord + grid![y][x]);
+      setSelectedLetters((arr) => {
+        const copy = arr!.map((a) => a.slice());
+        copy[y][x] = true;
+        return copy;
+      });
+      setLetterPath([...letterPath, [y, x]]);
+    }
   };
+
   const handleMouseUp = () => {
     setSelectedWord('');
     setSelectedLetters(Array(5).fill(Array(5).fill(false)));
-    setLastLetter([null, null]);
+    setLetterPath([]);
   };
 
   useEffect(() => {

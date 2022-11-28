@@ -20,6 +20,7 @@ export const Letter: React.FC<LetterProps> = ({
       className="gameLetter"
       onMouseDown={handleMouseDown}
       onMouseOver={handleMouseOver}
+      style={{ backgroundColor: selected ? 'yellow' : 'lightgreen' }}
     >
       {letter.toUpperCase()}
     </div>

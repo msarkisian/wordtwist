@@ -4,10 +4,14 @@
 
 .gameLetter {
   border: 1px solid black;
+  /* width: 60%; */
+  /* height: 60%; */
+  border-radius: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100px;
   cursor: pointer;
   user-select: none;
+  font-size: 200%;
 }
