@@ -3,6 +3,7 @@ import React from 'react';
 interface LetterProps {
   letter: string;
   selected: boolean;
+  isNewestLetter: boolean;
   handleMouseDown: React.MouseEventHandler;
   handleMouseOver: React.MouseEventHandler;
 
@@ -12,6 +13,7 @@ interface LetterProps {
 export const Letter: React.FC<LetterProps> = ({
   letter,
   selected,
+  isNewestLetter,
   handleMouseDown,
   handleMouseOver,
 }) => {
@@ -20,7 +22,11 @@ export const Letter: React.FC<LetterProps> = ({
       className="gameLetter"
       onMouseDown={handleMouseDown}
       onMouseOver={handleMouseOver}
-      style={{ backgroundColor: selected ? 'yellow' : 'lightgreen' }}
+      style={{
+        backgroundColor: selected ? 'yellow' : 'lightgreen',
+        // hacky "grow border inside only" solution
+        boxShadow: isNewestLetter ? '0px 0px 0px 3px black inset' : '',
+      }}
     >
       {letter.toUpperCase()}
     </div>

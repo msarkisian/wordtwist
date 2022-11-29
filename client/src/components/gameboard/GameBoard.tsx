@@ -105,6 +105,11 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
             key={`${x},${y}`}
             letter={column}
             selected={selectedLetters![y][x]}
+            isNewestLetter={
+              letterPath[0] &&
+              letterPath[letterPath.length - 1][0] === y &&
+              letterPath[letterPath.length - 1][1] === x
+            }
             handleMouseDown={() => handleMouseDown(y, x)}
             handleMouseOver={() => handleMouseOver(y, x)}
           />
