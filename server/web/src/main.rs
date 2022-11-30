@@ -1,9 +1,11 @@
-use actix_web::{App, HttpServer};
+use axum::{routing::get, Router};
 
-#[actix_web::main]
-async fn main() -> std::io::Result<()> {
-    HttpServer::new(|| App::new())
-        .bind("127.0.0.1:8080")?
-        .run()
+#[tokio::main]
+async fn main() {
+    let app = Router::new().route("/", get(|| async { "Hello World!" }));
+
+    axum::Server::bind(&"127.0.0.1:8080".parse().unwrap())
+        .serve(app.into_make_service())
         .await
+        .unwrap();
 }
