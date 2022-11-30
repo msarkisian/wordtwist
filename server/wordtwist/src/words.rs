@@ -39,9 +39,12 @@ pub fn get_random_word(words: &Vec<String>) -> Option<&String> {
     words.choose(&mut thread_rng())
 }
 
-/// Generates a random letter
+/// Generates a vowel-weighted random letter
 pub fn get_random_letter() -> char {
-    ('a'..='z').choose(&mut thread_rng()).unwrap()
+    ('a'..='z')
+        .chain(['a', 'e', 'i', 'o', 'u'])
+        .choose(&mut thread_rng())
+        .unwrap()
 }
 
 /// Generates a random word of length `n`, from the wordlist
