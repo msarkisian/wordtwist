@@ -1,3 +1,6 @@
+mod game;
+pub mod user;
+
 use axum::{routing::get, Router};
 
 #[tokio::main]

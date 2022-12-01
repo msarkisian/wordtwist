@@ -8,3 +8,5 @@ edition = "2021"
 [dependencies]
 axum = "0.6.1"
 tokio = {version = "1", features = ["full"]}
+wordtwist = { path = "../wordtwist"}
+chrono = "0.4.23"
