@@ -59,6 +59,8 @@ pub fn get_random_n_length_word(n: usize) -> String {
 ///
 /// Hopefully, this means that when we need to search for permutations of words, this makes
 /// it significantly cheaper
+///
+/// This returns a Vec of Options, so they can be removed later in a multithreaded context.
 fn filter_words_by_character(characters: &[char]) -> Vec<Option<String>> {
     WORDS
         .iter()
