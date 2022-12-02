@@ -1,14 +1,22 @@
 use std::collections::HashMap;
 
+use axum::{response::IntoResponse, Json};
+use serde::{Deserialize, Serialize};
 use wordtwist::game::GeneratedGame;
 
-use crate::user::User;
-
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Game<const N: usize> {
     data: GeneratedGame<N>,
-    players: HashMap<User, usize>,
 }
 
-pub struct DailyGame<const N: usize> {
-    game: Game<N>,
+impl<const N: usize> Game<N> {
+    pub fn new() -> Self {
+        Self {
+            data: GeneratedGame::<N>::new(),
+        }
+    }
+}
+
+pub async fn get_new_game() -> impl IntoResponse {
+    Json(Game::<5>::new())
 }
