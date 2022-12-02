@@ -2,6 +2,8 @@ use rand::{
     seq::{IteratorRandom, SliceRandom},
     thread_rng,
 };
+use serde::{Deserialize, Serialize};
+use serde_with::serde_as;
 
 use crate::words::{generate_wordlist_from_game, get_random_letter, get_random_n_length_word};
 
@@ -16,8 +18,10 @@ pub enum GameDirections {
     DownRight,
 }
 
-#[derive(Debug)]
+#[serde_as]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct GeneratedGame<const N: usize> {
+    #[serde_as(as = "[[_; N];N]")]
     grid: [[char; N]; N],
     valid_words: Vec<String>,
 }

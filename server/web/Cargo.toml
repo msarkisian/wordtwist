@@ -10,3 +10,4 @@ axum = "0.6.1"
 tokio = {version = "1", features = ["full"]}
 wordtwist = { path = "../wordtwist"}
 chrono = "0.4.23"
+serde = { version = "1.0", features = ["derive"] }
