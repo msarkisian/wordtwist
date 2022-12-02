@@ -1,5 +1,4 @@
 mod game;
-pub mod user;
 
 use axum::{routing::get, Router};
 use game::get_new_game;

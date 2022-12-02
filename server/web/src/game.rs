@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use axum::{response::IntoResponse, Json};
 use serde::{Deserialize, Serialize};
 use wordtwist::game::GeneratedGame;
