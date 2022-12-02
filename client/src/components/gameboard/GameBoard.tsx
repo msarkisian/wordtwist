@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Letter } from './Letter';
 import './GameBoard.css';
-import { GameGrid } from '../../@types';
+import { GameData, GameGrid } from '../../@types';
 
 interface GameBoardProps {}
 
@@ -16,6 +16,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
   const [selectedWord, setSelectedWord] = useState('');
   // this is to allow backtracking to remove letters from the selection
   const [letterPath, setLetterPath] = useState<[number, number][]>([]);
+  const [validWords, setValidWords] = useState<string[]>([]);
 
   const handleMouseDown = (y: number, x: number) => {
     if (!grid) return;
@@ -61,33 +62,37 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
     }
   };
 
-  const handleMouseUp = () => {
+  const handleMouseUp = (n: number) => {
+    if (validWords.includes(selectedWord)) {
+      setFoundWords([...foundWords, selectedWord]);
+      setValidWords(validWords.filter((word) => word !== selectedWord));
+    }
     setSelectedWord('');
-    setSelectedLetters(Array(5).fill(Array(5).fill(false)));
+    setSelectedLetters(Array(n).fill(Array(n).fill(false)));
     setLetterPath([]);
   };
-
-  useEffect(() => {
-    window.addEventListener('mouseup', handleMouseUp);
-  }, []);
-
-  const dummyGrid = [
-    ['f', 'e', 'b', 'r', 'n'],
-    ['n', 'o', 'e', 'b', 'h'],
-    ['n', 'v', 'r', 'e', 'g'],
-    ['t', 'e', 'm', 'c', 'b'],
-    ['r', 'f', 'y', 'l', 'v'],
-  ];
 
   if (!grid) {
     return (
       <button
         onClick={() => {
-          setGrid(dummyGrid);
-          setSelectedLetters(Array(5).fill(Array(5).fill(false)));
+          fetch('/game')
+            .then((res) => res.json())
+            .then((jsonRes: GameData) => {
+              setGrid(jsonRes.data.grid);
+              setValidWords(jsonRes.data.valid_words);
+              setSelectedLetters(
+                Array(jsonRes.data.grid.length).fill(
+                  Array(jsonRes.data.grid.length).fill(false)
+                )
+              );
+              // window.addEventListener('mouseup', () =>
+              //   handleMouseUp(jsonRes.data.grid.length)
+              // );
+            });
         }}
       >
-        load dummy grid
+        Load new game
       </button>
     );
   }
@@ -96,8 +101,9 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
     <div
       className="gameGrid"
       style={{
-        gridTemplateColumns: '100px '.repeat(dummyGrid.length),
+        gridTemplateColumns: '100px '.repeat(grid.length),
       }}
+      onMouseUp={() => handleMouseUp(grid.length)}
     >
       {grid.map((row, y) =>
         row.map((column, x) => (
@@ -116,6 +122,16 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
         ))
       )}
       <div>selected word: {selectedWord}</div>
+      {foundWords.length > 0 && (
+        <div>
+          Found words:
+          <ul>
+            {foundWords.map((word) => (
+              <li key={word}>{word}</li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 };
