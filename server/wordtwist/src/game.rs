@@ -46,22 +46,22 @@ impl<const N: usize> GeneratedGame<N> {
             if *y > 0 && *x > 0 && grid[*y - 1][*x - 1] == '0' {
                 output.push(GameDirections::UpLeft);
             }
-            if *y > 0 && *x < N - 2 && grid[*y - 1][*x + 1] == '0' {
+            if *y > 0 && *x < N - 1 && grid[*y - 1][*x + 1] == '0' {
                 output.push(GameDirections::UpRight);
             }
-            if *y < N - 2 && grid[*y + 1][*x] == '0' {
+            if *y < N - 1 && grid[*y + 1][*x] == '0' {
                 output.push(GameDirections::Down);
             }
-            if *y < N - 2 && *x > 0 && grid[*y + 1][*x - 1] == '0' {
+            if *y < N - 1 && *x > 0 && grid[*y + 1][*x - 1] == '0' {
                 output.push(GameDirections::DownLeft);
             }
-            if *y < N - 2 && *x < N - 2 && grid[*y + 1][*x + 1] == '0' {
+            if *y < N - 1 && *x < N - 1 && grid[*y + 1][*x + 1] == '0' {
                 output.push(GameDirections::DownRight);
             }
             if *x > 0 && grid[*y][*x - 1] == '0' {
                 output.push(GameDirections::Left);
             }
-            if *x < N - 2 && grid[*y][*x + 1] == '0' {
+            if *x < N - 1 && grid[*y][*x + 1] == '0' {
                 output.push(GameDirections::Right);
             }
             output

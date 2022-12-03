@@ -58,7 +58,7 @@ pub fn get_random_n_length_word(n: usize) -> String {
 /// those characters
 ///
 /// Hopefully, this means that when we need to search for permutations of words, this makes
-/// it significantly cheaper
+/// it significantly cheaper.
 ///
 /// This returns a Vec of Options, so they can be removed later in a multithreaded context.
 fn filter_words_by_character(characters: &[char]) -> Vec<Option<String>> {
@@ -108,7 +108,7 @@ pub fn generate_wordlist_from_game<const N: usize>(grid: &[[char; N]; N]) -> Vec
         }
         // up right
         if y > 0
-            && x < N - 2
+            && x < N - 1
             && grid[y - 1][x + 1] == next_char
             && !visited_squares[y - 1][x + 1]
             && search_for_word(grid, &word[1..], (y - 1, x + 1), visited_squares)
@@ -116,7 +116,7 @@ pub fn generate_wordlist_from_game<const N: usize>(grid: &[[char; N]; N]) -> Vec
             return true;
         }
         // down
-        if y < N - 2
+        if y < N - 1
             && grid[y + 1][x] == next_char
             && !visited_squares[y + 1][x]
             && search_for_word(grid, &word[1..], (y + 1, x), visited_squares)
@@ -124,7 +124,7 @@ pub fn generate_wordlist_from_game<const N: usize>(grid: &[[char; N]; N]) -> Vec
             return true;
         }
         // down left
-        if y < N - 2
+        if y < N - 1
             && x > 0
             && grid[y + 1][x - 1] == next_char
             && !visited_squares[y + 1][x - 1]
@@ -133,8 +133,8 @@ pub fn generate_wordlist_from_game<const N: usize>(grid: &[[char; N]; N]) -> Vec
             return true;
         }
         // down right
-        if y < N - 2
-            && x < N - 2
+        if y < N - 1
+            && x < N - 1
             && grid[y + 1][x + 1] == next_char
             && !visited_squares[y + 1][x + 1]
             && search_for_word(grid, &word[1..], (y + 1, x + 1), visited_squares)
@@ -150,7 +150,7 @@ pub fn generate_wordlist_from_game<const N: usize>(grid: &[[char; N]; N]) -> Vec
             return true;
         }
         // right
-        if x < N - 2
+        if x < N - 1
             && grid[y][x + 1] == next_char
             && !visited_squares[y][x + 1]
             && search_for_word(grid, &word[1..], (y, x + 1), visited_squares)
