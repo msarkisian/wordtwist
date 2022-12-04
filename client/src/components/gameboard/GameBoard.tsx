@@ -98,32 +98,34 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
   }
 
   return (
-    <div
-      className="gameGrid"
-      style={{
-        gridTemplateColumns: '100px '.repeat(grid.length),
-      }}
-      onMouseUp={() => handleMouseUp(grid.length)}
-    >
-      {grid.map((row, y) =>
-        row.map((column, x) => (
-          <Letter
-            key={`${x},${y}`}
-            letter={column}
-            selected={selectedLetters![y][x]}
-            isNewestLetter={
-              letterPath[0] &&
-              letterPath[letterPath.length - 1][0] === y &&
-              letterPath[letterPath.length - 1][1] === x
-            }
-            handleMouseDown={() => handleMouseDown(y, x)}
-            handleMouseOver={() => handleMouseOver(y, x)}
-          />
-        ))
-      )}
-      <div>selected word: {selectedWord}</div>
+    <div className="gameContainer">
+      <div
+        className="gameGrid"
+        style={{
+          gridTemplateColumns: '100px '.repeat(grid.length),
+        }}
+        onMouseUp={() => handleMouseUp(grid.length)}
+      >
+        {grid.map((row, y) =>
+          row.map((column, x) => (
+            <Letter
+              key={`${x},${y}`}
+              letter={column}
+              selected={selectedLetters![y][x]}
+              isNewestLetter={
+                letterPath[0] &&
+                letterPath[letterPath.length - 1][0] === y &&
+                letterPath[letterPath.length - 1][1] === x
+              }
+              handleMouseDown={() => handleMouseDown(y, x)}
+              handleMouseOver={() => handleMouseOver(y, x)}
+            />
+          ))
+        )}
+        <div>selected word: {selectedWord}</div>
+      </div>
       {foundWords.length > 0 && (
-        <div>
+        <div className="foundWordsContainer">
           Found words:
           <ul>
             {foundWords.map((word) => (
