@@ -117,7 +117,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
       <div
         className="gameGrid"
         style={{
-          gridTemplateColumns: '100px '.repeat(grid.length),
+          gridTemplateColumns: `${100 / grid.length}%`.repeat(grid.length),
         }}
         onMouseUp={() => handleMouseUp(grid.length)}
       >
@@ -139,7 +139,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
         )}
         <div>selected word: {selectedWord}</div>
       </div>
-      <div className="foundWordsContainer">
+      <div className="gameStatsContainer">
         <div>
           Time remaining:{' '}
           <strong>
