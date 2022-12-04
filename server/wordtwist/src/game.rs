@@ -7,7 +7,7 @@ use serde_with::serde_as;
 
 use crate::words::{generate_wordlist_from_game, get_random_letter, get_random_n_length_word};
 
-pub enum GameDirections {
+enum GameDirections {
     Up,
     Down,
     Left,
@@ -33,6 +33,7 @@ impl<const N: usize> Default for GeneratedGame<N> {
 }
 
 impl<const N: usize> GeneratedGame<N> {
+    /// Creates a new `GeneratedGame` of size `N` by `N`.
     pub fn new() -> Self {
         fn calculate_valid_directions<const N: usize>(
             grid: &[[char; N]; N],

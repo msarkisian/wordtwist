@@ -10,7 +10,7 @@ lazy_static! {
     static ref WORDS: Vec<String> = read_words();
 }
 
-/// Reads the result of `words.txt` into a `Result<Vec<String>>` of its contents
+/// Reads the result of `words.txt` into a vector of strings.
 fn read_words() -> Vec<String> {
     let text = fs::read_to_string("./words.txt").expect(
         "Wordlist not found! Please place a `words.txt` wordlist file in the crate directory.",
@@ -18,11 +18,7 @@ fn read_words() -> Vec<String> {
     text.lines().map(|w| w.to_lowercase()).collect()
 }
 
-/// Provided a reference of `words`, and a size `n`, returns a vector of all words of
-/// that size.
-///
-/// Words is passed as an argument to prevent having to reread the file, this could
-/// be refactored later.
+/// Provided a size `n`, returns a vector of all words of that size, using the module's `lazy_static!` `WORDS`.
 fn get_all_n_length_words(n: usize) -> Vec<String> {
     let mut output = Vec::new();
 
@@ -34,12 +30,14 @@ fn get_all_n_length_words(n: usize) -> Vec<String> {
     output
 }
 
-/// Given a vector of `words`, randomly selects one.
-pub fn get_random_word(words: &Vec<String>) -> Option<&String> {
+/// Randomly selects from `words`.
+pub fn get_random_word(words: &[String]) -> Option<&String> {
     words.choose(&mut thread_rng())
 }
 
-/// Generates a vowel-weighted random letter
+/// Generates a vowel-weighted random letter.
+///
+/// Vowels are twice as likely to be selected as consonants.
 pub fn get_random_letter() -> char {
     ('a'..='z')
         .chain(['a', 'e', 'i', 'o', 'u'])
@@ -47,7 +45,7 @@ pub fn get_random_letter() -> char {
         .unwrap()
 }
 
-/// Generates a random word of length `n`, from the wordlist
+/// Generates a random word of length `n` from the module's `lazy_static!` `WORDS`.
 pub fn get_random_n_length_word(n: usize) -> String {
     get_random_word(&get_all_n_length_words(n))
         .expect("Requested word of nonexistant size!")
@@ -55,10 +53,11 @@ pub fn get_random_n_length_word(n: usize) -> String {
 }
 
 /// Given `words` and `characters`, returns a new vector of only words solely comprised of
-/// those characters
+/// those characters.
 ///
-/// Hopefully, this means that when we need to search for permutations of words, this makes
-/// it significantly cheaper.
+/// This is to trim down the possible words to search for in grid permutations to a managable amount.
+///
+/// Future optimization here (e.g. with character number count) could increase performance further.
 ///
 /// This returns a Vec of Options, so they can be removed later in a multithreaded context.
 fn filter_words_by_character(characters: &[char]) -> Vec<Option<String>> {
@@ -74,6 +73,9 @@ fn filter_words_by_character(characters: &[char]) -> Vec<Option<String>> {
 }
 
 /// Given a game `&grid`, returns a vector of all the words that can be found inside that grid.
+///
+/// This function uses fork-join multithreading to increase performance, using the thread count set by the
+/// `THREADS` const of the module.
 pub fn generate_wordlist_from_game<const N: usize>(grid: &[[char; N]; N]) -> Vec<String> {
     /// Recursive helper function to search for the remaining `word` slice in the `grid`.
     fn search_for_word<const N: usize>(
