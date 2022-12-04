@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Letter } from './Letter';
 import './GameBoard.css';
 import { GameData, GameGrid } from '../../@types';
@@ -9,6 +9,8 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
   const [grid, setGrid] = useState<GameGrid | null>(null);
   const [foundWords, setFoundWords] = useState<string[]>([]);
   const [score, setScore] = useState(0);
+  const [remainingTime, setRemainingTime] = useState<number | null>(null);
+  const timerIntervalRef = useRef<number | undefined>(undefined);
   // not setting this to falses on initialization to account for different game sizes
   const [selectedLetters, setSelectedLetters] = useState<boolean[][] | null>(
     null
@@ -17,6 +19,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
   // this is to allow backtracking to remove letters from the selection
   const [letterPath, setLetterPath] = useState<[number, number][]>([]);
   const [validWords, setValidWords] = useState<string[]>([]);
+  const [postGame, setPostGame] = useState(false);
 
   const handleMouseDown = (y: number, x: number) => {
     if (!grid) return;
@@ -72,6 +75,19 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
     setLetterPath([]);
   };
 
+  const startTimer = () => {
+    timerIntervalRef.current = setInterval(() => {
+      setRemainingTime((t) => t! - 1);
+    }, 1000);
+  };
+
+  useEffect(() => {
+    if (remainingTime === 0) {
+      clearInterval(timerIntervalRef.current);
+      setPostGame(true);
+    }
+  }, [remainingTime]);
+
   if (!grid) {
     return (
       <button
@@ -86,9 +102,8 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
                   Array(jsonRes.data.grid.length).fill(false)
                 )
               );
-              // window.addEventListener('mouseup', () =>
-              //   handleMouseUp(jsonRes.data.grid.length)
-              // );
+              setRemainingTime(180);
+              startTimer();
             });
         }}
       >
@@ -124,16 +139,26 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
         )}
         <div>selected word: {selectedWord}</div>
       </div>
-      {foundWords.length > 0 && (
-        <div className="foundWordsContainer">
-          Found words:
-          <ul>
-            {foundWords.map((word) => (
-              <li key={word}>{word}</li>
-            ))}
-          </ul>
+      <div className="foundWordsContainer">
+        <div>
+          Time remaining:{' '}
+          <strong>
+            {remainingTime! > 60 ? (
+              <>
+                {Math.floor(remainingTime! / 60)}:{remainingTime! % 60}
+              </>
+            ) : (
+              <>{remainingTime!}</>
+            )}
+          </strong>
         </div>
-      )}
+        Found words:
+        <ul>
+          {foundWords.map((word) => (
+            <li key={word}>{word}</li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 };
