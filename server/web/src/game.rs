@@ -3,18 +3,18 @@ use serde::{Deserialize, Serialize};
 use wordtwist::game::GeneratedGame;
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct Game<const N: usize> {
-    data: GeneratedGame<N>,
+pub struct Game {
+    data: GeneratedGame,
 }
 
-impl<const N: usize> Game<N> {
-    pub fn new() -> Self {
+impl Game {
+    pub fn new(size: usize) -> Self {
         Self {
-            data: GeneratedGame::<N>::new(),
+            data: GeneratedGame::new(size),
         }
     }
 }
 
 pub async fn get_new_game() -> impl IntoResponse {
-    Json(Game::<5>::new())
+    Json(Game::new(5))
 }

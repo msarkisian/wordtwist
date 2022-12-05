@@ -3,7 +3,6 @@ use rand::{
     thread_rng,
 };
 use serde::{Deserialize, Serialize};
-use serde_with::serde_as;
 
 use crate::words::{generate_wordlist_from_game, get_random_letter, get_random_n_length_word};
 
@@ -18,27 +17,26 @@ enum GameDirections {
     DownRight,
 }
 
-#[serde_as]
 #[derive(Debug, Serialize, Deserialize)]
-pub struct GeneratedGame<const N: usize> {
-    #[serde_as(as = "[[_; N];N]")]
-    grid: [[char; N]; N],
+pub struct GeneratedGame {
+    grid: Vec<Vec<char>>,
     valid_words: Vec<String>,
 }
 
-impl<const N: usize> Default for GeneratedGame<N> {
+impl Default for GeneratedGame {
     fn default() -> Self {
-        Self::new()
+        Self::new(5)
     }
 }
 
-impl<const N: usize> GeneratedGame<N> {
-    /// Creates a new `GeneratedGame` of size `N` by `N`.
-    pub fn new() -> Self {
-        fn calculate_valid_directions<const N: usize>(
-            grid: &[[char; N]; N],
+impl GeneratedGame {
+    /// Creates a new `GeneratedGame` of `size` x `size`
+    pub fn new(size: usize) -> Self {
+        fn calculate_valid_directions(
+            grid: &Vec<Vec<char>>,
             (y, x): &(usize, usize),
         ) -> Vec<GameDirections> {
+            let grid_length = grid.len();
             let mut output = Vec::new();
 
             if *y > 0 && grid[*y - 1][*x] == '0' {
@@ -47,38 +45,38 @@ impl<const N: usize> GeneratedGame<N> {
             if *y > 0 && *x > 0 && grid[*y - 1][*x - 1] == '0' {
                 output.push(GameDirections::UpLeft);
             }
-            if *y > 0 && *x < N - 1 && grid[*y - 1][*x + 1] == '0' {
+            if *y > 0 && *x < grid_length - 1 && grid[*y - 1][*x + 1] == '0' {
                 output.push(GameDirections::UpRight);
             }
-            if *y < N - 1 && grid[*y + 1][*x] == '0' {
+            if *y < grid_length - 1 && grid[*y + 1][*x] == '0' {
                 output.push(GameDirections::Down);
             }
-            if *y < N - 1 && *x > 0 && grid[*y + 1][*x - 1] == '0' {
+            if *y < grid_length - 1 && *x > 0 && grid[*y + 1][*x - 1] == '0' {
                 output.push(GameDirections::DownLeft);
             }
-            if *y < N - 1 && *x < N - 1 && grid[*y + 1][*x + 1] == '0' {
+            if *y < grid_length - 1 && *x < grid_length - 1 && grid[*y + 1][*x + 1] == '0' {
                 output.push(GameDirections::DownRight);
             }
             if *x > 0 && grid[*y][*x - 1] == '0' {
                 output.push(GameDirections::Left);
             }
-            if *x < N - 1 && grid[*y][*x + 1] == '0' {
+            if *x < grid_length - 1 && grid[*y][*x + 1] == '0' {
                 output.push(GameDirections::Right);
             }
             output
         }
 
-        let target_word_size = (2 * N..3 * N)
+        let target_word_size = (2 * size..3 * size)
             .into_iter()
             .choose(&mut thread_rng())
             .unwrap();
         let target_word = get_random_n_length_word(target_word_size);
 
         let mut grid = 'outer: loop {
-            let mut grid = [['0'; N]; N];
+            let mut grid = vec![vec!['0'; size]; size];
             let start_point = (
-                (0..N).into_iter().choose(&mut thread_rng()).unwrap(),
-                (0..N).into_iter().choose(&mut thread_rng()).unwrap(),
+                (0..size).into_iter().choose(&mut thread_rng()).unwrap(),
+                (0..size).into_iter().choose(&mut thread_rng()).unwrap(),
             );
             let mut point = start_point;
 
@@ -106,12 +104,12 @@ impl<const N: usize> GeneratedGame<N> {
         }
 
         GeneratedGame {
-            grid,
             valid_words: generate_wordlist_from_game(&grid),
+            grid,
         }
     }
 
-    pub fn grid(&self) -> &[[char; N]; N] {
+    pub fn grid(&self) -> &Vec<Vec<char>> {
         &self.grid
     }
 
@@ -126,9 +124,7 @@ mod tests {
 
     #[test]
     fn test_game_generation() {
-        let _x = GeneratedGame::<5>::new();
-        let _y = GeneratedGame::<4>::new();
-        println!("{:?}", GeneratedGame::<5>::new());
-        println!("{:?}", GeneratedGame::<4>::new());
+        let _x = GeneratedGame::new(5);
+        let _y = GeneratedGame::new(4);
     }
 }

@@ -76,14 +76,15 @@ fn filter_words_by_character(characters: &[char]) -> Vec<Option<String>> {
 ///
 /// This function uses fork-join multithreading to increase performance, using the thread count set by the
 /// `THREADS` const of the module.
-pub fn generate_wordlist_from_game<const N: usize>(grid: &[[char; N]; N]) -> Vec<String> {
+pub fn generate_wordlist_from_game(grid: &Vec<Vec<char>>) -> Vec<String> {
     /// Recursive helper function to search for the remaining `word` slice in the `grid`.
-    fn search_for_word<const N: usize>(
-        grid: &[[char; N]; N],
+    fn search_for_word(
+        grid: &Vec<Vec<char>>,
         word: &str,
         (y, x): (usize, usize),
-        visited_squares: &mut [[bool; N]; N],
+        visited_squares: &mut Vec<Vec<bool>>,
     ) -> bool {
+        let grid_length = grid.len();
         visited_squares[y][x] = true;
 
         let next_char = match word.chars().next() {
@@ -110,7 +111,7 @@ pub fn generate_wordlist_from_game<const N: usize>(grid: &[[char; N]; N]) -> Vec
         }
         // up right
         if y > 0
-            && x < N - 1
+            && x < grid_length - 1
             && grid[y - 1][x + 1] == next_char
             && !visited_squares[y - 1][x + 1]
             && search_for_word(grid, &word[1..], (y - 1, x + 1), visited_squares)
@@ -118,7 +119,7 @@ pub fn generate_wordlist_from_game<const N: usize>(grid: &[[char; N]; N]) -> Vec
             return true;
         }
         // down
-        if y < N - 1
+        if y < grid_length - 1
             && grid[y + 1][x] == next_char
             && !visited_squares[y + 1][x]
             && search_for_word(grid, &word[1..], (y + 1, x), visited_squares)
@@ -126,7 +127,7 @@ pub fn generate_wordlist_from_game<const N: usize>(grid: &[[char; N]; N]) -> Vec
             return true;
         }
         // down left
-        if y < N - 1
+        if y < grid_length - 1
             && x > 0
             && grid[y + 1][x - 1] == next_char
             && !visited_squares[y + 1][x - 1]
@@ -135,8 +136,8 @@ pub fn generate_wordlist_from_game<const N: usize>(grid: &[[char; N]; N]) -> Vec
             return true;
         }
         // down right
-        if y < N - 1
-            && x < N - 1
+        if y < grid_length - 1
+            && x < grid_length - 1
             && grid[y + 1][x + 1] == next_char
             && !visited_squares[y + 1][x + 1]
             && search_for_word(grid, &word[1..], (y + 1, x + 1), visited_squares)
@@ -152,7 +153,7 @@ pub fn generate_wordlist_from_game<const N: usize>(grid: &[[char; N]; N]) -> Vec
             return true;
         }
         // right
-        if x < N - 1
+        if x < grid_length - 1
             && grid[y][x + 1] == next_char
             && !visited_squares[y][x + 1]
             && search_for_word(grid, &word[1..], (y, x + 1), visited_squares)
@@ -163,7 +164,7 @@ pub fn generate_wordlist_from_game<const N: usize>(grid: &[[char; N]; N]) -> Vec
         false
     }
 
-    let mut letters = (*grid).into_iter().flatten().collect::<Vec<_>>();
+    let mut letters: Vec<char> = grid.iter().flatten().copied().collect();
     letters.sort();
     letters.dedup();
 
@@ -185,7 +186,8 @@ pub fn generate_wordlist_from_game<const N: usize>(grid: &[[char; N]; N]) -> Vec
                     for (y, row) in grid.iter().enumerate() {
                         for (x, grid_character) in row.iter().enumerate() {
                             if *grid_character == first_char {
-                                let mut visited_squares = [[false; N]; N];
+                                let mut visited_squares =
+                                    vec![vec![false; grid.len()]; grid[0].len()];
                                 if search_for_word(grid, &word[1..], (y, x), &mut visited_squares) {
                                     thread_wordlist.push(word);
                                     continue 'words;
