@@ -92,7 +92,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
     return (
       <button
         onClick={() => {
-          fetch('/game')
+          fetch('/game/5')
             .then((res) => res.json())
             .then((jsonRes: GameData) => {
               setGrid(jsonRes.data.grid);

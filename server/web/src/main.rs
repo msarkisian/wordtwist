@@ -7,7 +7,7 @@ use game::get_new_game;
 async fn main() {
     let app = Router::new()
         .route("/", get(|| async { "Hello World!" }))
-        .route("/game", get(get_new_game));
+        .route("/game/:size", get(get_new_game));
 
     axum::Server::bind(&"127.0.0.1:8080".parse().unwrap())
         .serve(app.into_make_service())
