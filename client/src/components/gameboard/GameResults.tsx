@@ -18,6 +18,7 @@ export const GameResults: React.FC<GameResultsProps> = ({
       <p>
         You scored <strong>{score}</strong> points!
       </p>
+      <button onClick={reset}>Start new game</button>
       <p>Words in this puzzle:</p>
       <ul>
         {foundWords.map((word) => (
@@ -31,7 +32,6 @@ export const GameResults: React.FC<GameResultsProps> = ({
           </li>
         ))}
       </ul>
-      <button onClick={reset}>Start new game</button>
     </div>
   );
 };
