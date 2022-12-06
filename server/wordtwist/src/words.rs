@@ -2,7 +2,7 @@ use rand::{
     seq::{IteratorRandom, SliceRandom},
     thread_rng,
 };
-use std::{fs, thread};
+use std::thread;
 
 const THREADS: usize = 8;
 
@@ -12,9 +12,7 @@ lazy_static! {
 
 /// Reads the result of `words.txt` into a vector of strings.
 fn read_words() -> Vec<String> {
-    let text = fs::read_to_string("./words.txt").expect(
-        "Wordlist not found! Please place a `words.txt` wordlist file in the crate directory.",
-    );
+    let text = include_str!("../words.txt");
     text.lines().map(|w| w.to_lowercase()).collect()
 }
 
