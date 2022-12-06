@@ -2,9 +2,6 @@ use rand::{
     seq::{IteratorRandom, SliceRandom},
     thread_rng,
 };
-use std::thread;
-
-const THREADS: usize = 8;
 
 lazy_static! {
     static ref WORDS: Vec<String> = read_words();
@@ -58,12 +55,12 @@ pub fn get_random_n_length_word(n: usize) -> String {
 /// Future optimization here (e.g. with character number count) could increase performance further.
 ///
 /// This returns a Vec of Options, so they can be removed later in a multithreaded context.
-fn filter_words_by_character(characters: &[char]) -> Vec<Option<String>> {
+fn filter_words_by_character(characters: &[char]) -> Vec<String> {
     WORDS
         .iter()
         .filter_map(|w| {
             if w.chars().all(|c| characters.contains(&c)) {
-                return Some(Some(w.to_string()));
+                return Some(w.to_string());
             }
             None
         })
@@ -166,42 +163,24 @@ pub fn generate_wordlist_from_game(grid: &Vec<Vec<char>>) -> Vec<String> {
     letters.sort();
     letters.dedup();
 
-    let mut possible_words = filter_words_by_character(&letters);
-    let possible_words_len = possible_words.len();
-    let mut possible_word_chunks = possible_words.chunks_mut((possible_words_len / THREADS) + 1);
+    let possible_words = filter_words_by_character(&letters);
     let mut wordlist: Vec<String> = Vec::new();
 
-    thread::scope(|s| {
-        let mut handles = Vec::with_capacity(THREADS);
-        for _ in 0..THREADS {
-            let thread_possible_words = possible_word_chunks.next().unwrap();
-            handles.push(s.spawn(move || {
-                let mut thread_wordlist = Vec::new();
-                'words: for word_option in thread_possible_words {
-                    let word = word_option.take().unwrap();
-                    let first_char = word.chars().next().unwrap();
+    'words: for word in possible_words {
+        let first_char = word.chars().next().unwrap();
 
-                    for (y, row) in grid.iter().enumerate() {
-                        for (x, grid_character) in row.iter().enumerate() {
-                            if *grid_character == first_char {
-                                let mut visited_squares =
-                                    vec![vec![false; grid.len()]; grid[0].len()];
-                                if search_for_word(grid, &word[1..], (y, x), &mut visited_squares) {
-                                    thread_wordlist.push(word);
-                                    continue 'words;
-                                }
-                            }
-                        }
+        for (y, row) in grid.iter().enumerate() {
+            for (x, grid_character) in row.iter().enumerate() {
+                if *grid_character == first_char {
+                    let mut visited_squares = vec![vec![false; grid.len()]; grid[0].len()];
+                    if search_for_word(grid, &word[1..], (y, x), &mut visited_squares) {
+                        wordlist.push(word);
+                        continue 'words;
                     }
                 }
-                thread_wordlist
-            }))
+            }
         }
-
-        for handle in handles {
-            wordlist.extend(handle.join().unwrap());
-        }
-    });
+    }
     wordlist
 }
 
