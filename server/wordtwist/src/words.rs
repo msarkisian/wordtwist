@@ -53,8 +53,6 @@ pub fn get_random_n_length_word(n: usize) -> String {
 /// This is to trim down the possible words to search for in grid permutations to a managable amount.
 ///
 /// Future optimization here (e.g. with character number count) could increase performance further.
-///
-/// This returns a Vec of Options, so they can be removed later in a multithreaded context.
 fn filter_words_by_character(characters: &[char]) -> Vec<String> {
     WORDS
         .iter()
