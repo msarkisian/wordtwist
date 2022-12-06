@@ -119,6 +119,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
   useEffect(() => {
     if (remainingTime === 0) {
       clearInterval(timerIntervalRef.current);
+      setValidWords([...validWords].sort((a, b) => b.length - a.length));
       setPostGame(true);
     }
   }, [remainingTime]);
@@ -142,7 +143,6 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
         foundWords={foundWords}
         score={score}
         validWords={validWords}
-        setValidWords={setValidWords}
         reset={reset}
       />
     );
