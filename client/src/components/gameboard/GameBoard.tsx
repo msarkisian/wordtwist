@@ -4,6 +4,7 @@ import './GameBoard.css';
 import { GameData, GameGrid } from '../../@types';
 import { GameOptions } from './GameOptions';
 import { useLocalStorageState } from '../../hooks/useLocalStorageState';
+import { GameResults } from './GameResults';
 
 interface GameBoardProps {}
 
@@ -25,7 +26,8 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
   const [postGame, setPostGame] = useState(false);
 
   // generational state:
-  const [size, setSize] = useLocalStorageState('size', 5);
+  const [size, setSize] = useLocalStorageState('lastSize', 5);
+  const [lastTime, setLastTime] = useLocalStorageState('lastTime', 120);
 
   const handleMouseDown = (y: number, x: number) => {
     if (!grid) return;
@@ -101,6 +103,18 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
     }, 1000);
   };
 
+  const reset = () => {
+    setGrid(null);
+    setFoundWords([]);
+    setScore(0);
+    setSelectedLetters(null);
+    setSelectedWord('');
+    setLetterPath([]);
+    setRemainingTime(lastTime);
+    setPreGame(true);
+    setPostGame(false);
+  };
+
   useEffect(() => {
     if (remainingTime === 0) {
       clearInterval(timerIntervalRef.current);
@@ -113,9 +127,21 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
       <GameOptions
         remainingTime={remainingTime}
         setRemainingTime={setRemainingTime}
+        setLastTime={setLastTime}
         size={size}
         setSize={setSize}
         startGame={startGame}
+      />
+    );
+  }
+
+  if (postGame) {
+    return (
+      <GameResults
+        foundWords={foundWords}
+        score={score}
+        validWords={validWords}
+        reset={reset}
       />
     );
   }
