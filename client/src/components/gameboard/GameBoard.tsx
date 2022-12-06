@@ -145,7 +145,10 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
           <strong>
             {remainingTime! > 60 ? (
               <>
-                {Math.floor(remainingTime! / 60)}:{remainingTime! % 60}
+                {Math.floor(remainingTime! / 60)}:
+                {remainingTime! % 60 < 10
+                  ? `0${remainingTime! % 60}`
+                  : remainingTime! % 60}
               </>
             ) : (
               <>{remainingTime!}</>
