@@ -142,6 +142,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
         foundWords={foundWords}
         score={score}
         validWords={validWords}
+        setValidWords={setValidWords}
         reset={reset}
       />
     );

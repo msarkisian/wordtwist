@@ -4,6 +4,7 @@ interface GameResultsProps {
   score: number;
   foundWords: string[];
   validWords: string[];
+  setValidWords: (wordlist: string[]) => void;
   reset: () => void;
 }
 
@@ -11,8 +12,10 @@ export const GameResults: React.FC<GameResultsProps> = ({
   score,
   foundWords,
   validWords,
+  setValidWords,
   reset,
 }) => {
+  setValidWords([...validWords].sort((a, b) => b.length - a.length));
   return (
     <div className="gameResults">
       <p>
