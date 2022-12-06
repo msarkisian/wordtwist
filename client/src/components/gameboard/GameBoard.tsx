@@ -77,6 +77,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
     if (validWords.includes(selectedWord)) {
       setFoundWords([...foundWords, selectedWord]);
       setValidWords(validWords.filter((word) => word !== selectedWord));
+      setScore((s) => s + 2 ** selectedWord.length);
     }
     setSelectedWord('');
     setSelectedLetters(Array(n).fill(Array(n).fill(false)));
@@ -188,6 +189,9 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
               <>{remainingTime!}</>
             )}
           </strong>
+        </div>
+        <div>
+          Score: <strong>{score}</strong>
         </div>
         Found words:
         <ul>
