@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Letter } from './Letter';
 import './GameBoard.css';
 import { GameData, GameGrid } from '../../@types';
+import { GameOptions } from './GameOptions';
 
 interface GameBoardProps {}
 
@@ -9,7 +10,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
   const [grid, setGrid] = useState<GameGrid | null>(null);
   const [foundWords, setFoundWords] = useState<string[]>([]);
   const [score, setScore] = useState(0);
-  const [remainingTime, setRemainingTime] = useState<number | null>(null);
+  const [remainingTime, setRemainingTime] = useState<number>(120);
   const timerIntervalRef = useRef<number | undefined>(undefined);
   // not setting this to falses on initialization to account for different game sizes
   const [selectedLetters, setSelectedLetters] = useState<boolean[][] | null>(
@@ -19,7 +20,11 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
   // this is to allow backtracking to remove letters from the selection
   const [letterPath, setLetterPath] = useState<[number, number][]>([]);
   const [validWords, setValidWords] = useState<string[]>([]);
+  const [preGame, setPreGame] = useState(true);
   const [postGame, setPostGame] = useState(false);
+
+  // generational state:
+  const [size, setSize] = useState(5);
 
   const handleMouseDown = (y: number, x: number) => {
     if (!grid) return;
@@ -75,6 +80,20 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
     setLetterPath([]);
   };
 
+  const startGame = async () => {
+    const res = await fetch(`/game/${size}`);
+    const jsonRes: GameData = await res.json();
+    setGrid(jsonRes.data.grid);
+    setValidWords(jsonRes.data.valid_words);
+    setSelectedLetters(
+      Array(jsonRes.data.grid.length).fill(
+        Array(jsonRes.data.grid.length).fill(false)
+      )
+    );
+    startTimer();
+    setPreGame(false);
+  };
+
   const startTimer = () => {
     timerIntervalRef.current = setInterval(() => {
       setRemainingTime((t) => t! - 1);
@@ -88,40 +107,52 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
     }
   }, [remainingTime]);
 
-  if (!grid) {
+  if (preGame) {
     return (
-      <button
-        onClick={() => {
-          fetch('/game/5')
-            .then((res) => res.json())
-            .then((jsonRes: GameData) => {
-              setGrid(jsonRes.data.grid);
-              setValidWords(jsonRes.data.valid_words);
-              setSelectedLetters(
-                Array(jsonRes.data.grid.length).fill(
-                  Array(jsonRes.data.grid.length).fill(false)
-                )
-              );
-              setRemainingTime(180);
-              startTimer();
-            });
-        }}
-      >
-        Load new game
-      </button>
+      <GameOptions
+        remainingTime={remainingTime}
+        setRemainingTime={setRemainingTime}
+        size={size}
+        setSize={setSize}
+        startGame={startGame}
+      />
     );
   }
+
+  // if (!grid) {
+  //   return (
+  //     <button
+  //       onClick={() => {
+  //         fetch('/game/5')
+  //           .then((res) => res.json())
+  //           .then((jsonRes: GameData) => {
+  //             setGrid(jsonRes.data.grid);
+  //             setValidWords(jsonRes.data.valid_words);
+  //             setSelectedLetters(
+  //               Array(jsonRes.data.grid.length).fill(
+  //                 Array(jsonRes.data.grid.length).fill(false)
+  //               )
+  //             );
+  //             setRemainingTime(180);
+  //             startTimer();
+  //           });
+  //       }}
+  //     >
+  //       Load new game
+  //     </button>
+  //   );
+  // }
 
   return (
     <div className="gameContainer">
       <div
         className="gameGrid"
         style={{
-          gridTemplateColumns: `${100 / grid.length}%`.repeat(grid.length),
+          gridTemplateColumns: `${100 / grid!.length}%`.repeat(grid!.length),
         }}
-        onMouseUp={() => handleMouseUp(grid.length)}
+        onMouseUp={() => handleMouseUp(grid!.length)}
       >
-        {grid.map((row, y) =>
+        {grid!.map((row, y) =>
           row.map((column, x) => (
             <Letter
               key={`${x},${y}`}

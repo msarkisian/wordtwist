@@ -23,3 +23,18 @@
 .gameStatsContainer {
   padding-left: 5%;
 }
+
+.gameForm {
+  display: flex;
+  flex-flow: column wrap;
+  max-width: 300px;
+}
+
+/* .gameForm>* {
+  max-width: 20%;
+} */
+
+.gameForm>label {
+  display: flex;
+  justify-content: space-between;
+}
