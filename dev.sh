@@ -1,0 +1,1 @@
+yarn --cwd client/ run dev & cargo run --manifest-path server/Cargo.toml
