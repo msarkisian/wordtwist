@@ -3,6 +3,7 @@ import { Letter } from './Letter';
 import './GameBoard.css';
 import { GameData, GameGrid } from '../../@types';
 import { GameOptions } from './GameOptions';
+import { useLocalStorageState } from '../../hooks/useLocalStorageState';
 
 interface GameBoardProps {}
 
@@ -24,7 +25,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
   const [postGame, setPostGame] = useState(false);
 
   // generational state:
-  const [size, setSize] = useState(5);
+  const [size, setSize] = useLocalStorageState('size', 5);
 
   const handleMouseDown = (y: number, x: number) => {
     if (!grid) return;
