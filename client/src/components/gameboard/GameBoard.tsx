@@ -120,30 +120,6 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
     );
   }
 
-  // if (!grid) {
-  //   return (
-  //     <button
-  //       onClick={() => {
-  //         fetch('/game/5')
-  //           .then((res) => res.json())
-  //           .then((jsonRes: GameData) => {
-  //             setGrid(jsonRes.data.grid);
-  //             setValidWords(jsonRes.data.valid_words);
-  //             setSelectedLetters(
-  //               Array(jsonRes.data.grid.length).fill(
-  //                 Array(jsonRes.data.grid.length).fill(false)
-  //               )
-  //             );
-  //             setRemainingTime(180);
-  //             startTimer();
-  //           });
-  //       }}
-  //     >
-  //       Load new game
-  //     </button>
-  //   );
-  // }
-
   return (
     <div className="gameContainer">
       <div
