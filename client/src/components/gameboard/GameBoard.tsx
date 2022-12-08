@@ -9,10 +9,14 @@ import { GameResults } from './GameResults';
 interface GameBoardProps {}
 
 export const GameBoard: React.FC<GameBoardProps> = ({}) => {
+  // generational state:
+  const [size, setSize] = useLocalStorageState('lastSize', 5);
+  const [lastTime, setLastTime] = useLocalStorageState('lastTime', 120);
+
   const [grid, setGrid] = useState<GameGrid | null>(null);
   const [foundWords, setFoundWords] = useState<string[]>([]);
   const [score, setScore] = useState(0);
-  const [remainingTime, setRemainingTime] = useState<number>(120);
+  const [remainingTime, setRemainingTime] = useState<number>(lastTime);
   const timerIntervalRef = useRef<number | undefined>(undefined);
   // not setting this to falses on initialization to account for different game sizes
   const [selectedLetters, setSelectedLetters] = useState<boolean[][] | null>(
@@ -24,10 +28,6 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
   const [validWords, setValidWords] = useState<string[]>([]);
   const [preGame, setPreGame] = useState(true);
   const [postGame, setPostGame] = useState(false);
-
-  // generational state:
-  const [size, setSize] = useLocalStorageState('lastSize', 5);
-  const [lastTime, setLastTime] = useLocalStorageState('lastTime', 120);
 
   const handleMouseDown = (y: number, x: number) => {
     if (!grid) return;
