@@ -1,5 +1,6 @@
 ### SERVER
 server/target
+server/web/sql.db3
 
 ### CLIENT
 # Logs

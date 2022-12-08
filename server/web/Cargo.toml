@@ -11,3 +11,4 @@ axum-extra = { version = "0.4.2", features = ["spa"] }
 tokio = {version = "1", features = ["full"]}
 wordtwist = { path = "../wordtwist"}
 serde = { version = "1.0", features = ["derive"] }
+rusqlite = { version = "0.28.0", features = ["bundled"]}
