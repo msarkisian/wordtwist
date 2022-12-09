@@ -10,6 +10,7 @@ interface GameBoardProps {}
 
 export const GameBoard: React.FC<GameBoardProps> = ({}) => {
   // generational state:
+  const [gameId, setGameId] = useState<string | null>(null);
   const [size, setSize] = useLocalStorageState('lastSize', 5);
   const [lastTime, setLastTime] = useLocalStorageState('lastTime', 120);
 
@@ -84,9 +85,13 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
     setLetterPath([]);
   };
 
-  const startGame = async () => {
-    const res = await fetch(`/game/${size}`);
+  const startGame = async (id: string | null) => {
+    let url: string;
+    if (id) url = `/game/id/${id}`;
+    else url = `/game/${size}`;
+    const res = await fetch(url);
     const jsonRes: GameData = await res.json();
+    setGameId(jsonRes.id);
     setGrid(jsonRes.data.grid);
     setValidWords(jsonRes.data.valid_words);
     setSelectedLetters(
@@ -140,6 +145,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
   if (postGame) {
     return (
       <GameResults
+        gameId={gameId!}
         foundWords={foundWords}
         score={score}
         validWords={validWords}

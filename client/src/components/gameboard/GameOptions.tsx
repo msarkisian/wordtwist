@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 interface GameOptionsProps {
   remainingTime: number;
@@ -6,7 +6,7 @@ interface GameOptionsProps {
   setLastTime: (time: number) => void;
   size: number;
   setSize: (size: number) => void;
-  startGame: () => void;
+  startGame: (id: null | string) => void;
 }
 
 export const GameOptions: React.FC<GameOptionsProps> = ({
@@ -17,6 +17,8 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
   setSize,
   startGame,
 }) => {
+  const [loadingGameFromId, setLoadingGameFromId] = useState(false);
+  const [gameId, setGameId] = useState<string | null>(null);
   return (
     <form className="gameForm">
       <label>
@@ -44,12 +46,43 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
           }}
         />
       </label>
+      <div>
+        <input
+          type="radio"
+          value="new"
+          id="new"
+          name="newOrId"
+          onClick={() => {
+            setLoadingGameFromId(false);
+            setGameId(null);
+          }}
+        />
+        <label htmlFor="new">New game</label>
+        <input
+          type="radio"
+          value="fromId"
+          id="fromId"
+          name="newOrId"
+          onClick={() => {
+            setLoadingGameFromId(true);
+            setGameId('');
+          }}
+        />
+        <label htmlFor="fromId">Load from Game ID</label>
+      </div>
+      {loadingGameFromId && (
+        <input
+          placeholder="Game ID"
+          value={gameId!}
+          onChange={(e) => setGameId(e.target.value)}
+        />
+      )}
       <input
         type={'submit'}
         value="Start game"
         onClick={(e) => {
           e.preventDefault();
-          startGame();
+          startGame(gameId);
         }}
         disabled={
           size < 3 || size > 7 || remainingTime < 10 || remainingTime > 600
