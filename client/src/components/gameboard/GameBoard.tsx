@@ -195,7 +195,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
           Score: <strong>{score}</strong>
         </div>
         Found words:
-        <ul>
+        <ul className="foundWordsList">
           {foundWords.map((word) => (
             <li key={word}>{word}</li>
           ))}

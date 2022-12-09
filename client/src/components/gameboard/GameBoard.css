@@ -1,6 +1,5 @@
 .gameContainer {
-  display: grid;
-  grid-template-columns: 3fr 7fr;
+  display: flex;
 }
 
 .gameGrid {
@@ -22,6 +21,10 @@
 
 .gameStatsContainer {
   padding-left: 5%;
+}
+
+.foundWordsList {
+  max-height: 50px;
 }
 
 .gameForm {
