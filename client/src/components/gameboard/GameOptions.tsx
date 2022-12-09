@@ -51,6 +51,9 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
           e.preventDefault();
           startGame();
         }}
+        disabled={
+          size < 3 || size > 8 || remainingTime < 10 || remainingTime > 600
+        }
       />
     </form>
   );
