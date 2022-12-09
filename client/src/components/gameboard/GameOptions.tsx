@@ -26,7 +26,7 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
           name="size"
           value={size}
           min="3"
-          max="8"
+          max="7"
           onChange={(e) => setSize(Number(e.target.value))}
         />
       </label>
@@ -52,7 +52,7 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
           startGame();
         }}
         disabled={
-          size < 3 || size > 8 || remainingTime < 10 || remainingTime > 600
+          size < 3 || size > 7 || remainingTime < 10 || remainingTime > 600
         }
       />
     </form>
