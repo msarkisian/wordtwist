@@ -17,7 +17,7 @@ enum GameDirections {
     DownRight,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct GeneratedGame {
     grid: Vec<Vec<char>>,
     valid_words: Vec<String>,

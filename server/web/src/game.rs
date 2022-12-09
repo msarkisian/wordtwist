@@ -4,7 +4,7 @@ use wordtwist::game::GeneratedGame;
 
 use crate::db::open_db_connection;
 
-#[derive(Debug, Deserialize, Serialize, PartialEq)]
+#[derive(Debug, Deserialize, Serialize, PartialEq, Eq)]
 pub struct Game {
     id: String,
     data: GeneratedGame,
