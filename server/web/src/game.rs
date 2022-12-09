@@ -2,7 +2,7 @@ use axum::{extract::Path, http::StatusCode, response::IntoResponse, Json};
 use serde::{Deserialize, Serialize};
 use wordtwist::game::GeneratedGame;
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, PartialEq)]
 pub struct Game {
     data: GeneratedGame,
 }
