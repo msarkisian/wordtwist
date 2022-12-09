@@ -1,8 +1,7 @@
 use rusqlite::{Connection, Result};
 
-pub fn open_db_connection() -> Result<()> {
-    let db = Connection::open("./web/sql.db3")?;
+mod game;
 
-    println!("{}", db.is_autocommit());
-    Ok(())
+pub fn open_db_connection() -> Result<Connection> {
+    Ok(Connection::open("./web/sql.db3")?)
 }
