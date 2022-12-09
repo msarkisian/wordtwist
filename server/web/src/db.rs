@@ -1,7 +1,7 @@
-use rusqlite::{Connection, Result};
+use rusqlite::Connection;
 
-mod game;
+pub mod game;
 
-pub fn open_db_connection() -> Result<Connection> {
-    Ok(Connection::open("../web/sql.db3")?)
+pub fn open_db_connection() -> Connection {
+    Connection::open("./web/sql.db3").expect("error connecting to database")
 }

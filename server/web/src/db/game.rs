@@ -28,7 +28,7 @@ mod test {
 
     #[test]
     fn insert_and_get() {
-        let mut connection = open_db_connection().unwrap();
+        let mut connection = open_db_connection();
         let game = GeneratedGame::new(5);
 
         let game_id = insert_game(&mut connection, &game).unwrap();

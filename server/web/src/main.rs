@@ -8,7 +8,8 @@ use game::get_new_game;
 
 #[tokio::main]
 async fn main() {
-    let _ = open_db_connection();
+    let conn = open_db_connection();
+
     let app = Router::new()
         .merge(SpaRouter::new("/assets", "../client/dist/assets").index_file("../index.html"))
         .route("/game/:size", get(get_new_game));

@@ -2,15 +2,23 @@ use axum::{extract::Path, http::StatusCode, response::IntoResponse, Json};
 use serde::{Deserialize, Serialize};
 use wordtwist::game::GeneratedGame;
 
+use crate::db::open_db_connection;
+
 #[derive(Debug, Deserialize, Serialize, PartialEq)]
 pub struct Game {
+    id: String,
     data: GeneratedGame,
 }
 
 impl Game {
     pub fn new(size: usize) -> Self {
+        let mut conn = open_db_connection();
+        let game = GeneratedGame::new(size);
+
+        let uuid = crate::db::game::insert_game(&mut conn, &game).unwrap();
         Self {
-            data: GeneratedGame::new(size),
+            id: uuid.to_string(),
+            data: game,
         }
     }
 }
