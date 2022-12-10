@@ -26,6 +26,7 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
         <input
           type="number"
           name="size"
+          disabled={loadingGameFromId}
           value={size}
           min="3"
           max="7"
