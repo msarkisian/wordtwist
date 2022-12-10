@@ -22,6 +22,13 @@ impl Game {
             data: game,
         }
     }
+
+    pub fn from(uuid: Uuid, data: GeneratedGame) -> Self {
+        Self {
+            id: uuid.to_string(),
+            data,
+        }
+    }
 }
 
 pub async fn get_new_game(Path(size): Path<usize>) -> impl IntoResponse {
@@ -40,7 +47,7 @@ pub async fn get_existing_game_by_id(Path(id): Path<String>) -> impl IntoRespons
         Ok(id) => id,
         Err(_) => return Err((StatusCode::BAD_REQUEST, "Cannot parse provided id")),
     };
-    let game = match get_game_by_id(conn, id) {
+    let game_data = match get_game_by_id(conn, id) {
         Ok(game) => game,
         Err(rusqlite::Error::QueryReturnedNoRows) => {
             return Err((StatusCode::NOT_FOUND, "Game with specified ID not found"))
@@ -53,5 +60,5 @@ pub async fn get_existing_game_by_id(Path(id): Path<String>) -> impl IntoRespons
         }
     };
 
-    Ok((StatusCode::OK, Json(game)))
+    Ok((StatusCode::OK, Json(Game::from(id, game_data))))
 }
