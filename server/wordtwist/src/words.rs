@@ -66,9 +66,6 @@ fn filter_words_by_character(characters: &[char]) -> Vec<String> {
 }
 
 /// Given a game `&grid`, returns a vector of all the words that can be found inside that grid.
-///
-/// This function uses fork-join multithreading to increase performance, using the thread count set by the
-/// `THREADS` const of the module.
 pub fn generate_wordlist_from_game(grid: &Vec<Vec<char>>) -> Vec<String> {
     /// Recursive helper function to search for the remaining `word` slice in the `grid`.
     fn search_for_word(
