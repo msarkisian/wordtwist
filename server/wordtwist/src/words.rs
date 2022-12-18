@@ -7,7 +7,7 @@ lazy_static! {
     static ref WORDS: Vec<String> = read_words();
 }
 
-/// Reads the result of `words.txt` into a vector of strings.
+/// Parses the compiled wordlist (from `words.txt`) into a vector of individual words.
 fn read_words() -> Vec<String> {
     let text = include_str!("../words.txt");
     text.lines().map(|w| w.to_lowercase()).collect()
