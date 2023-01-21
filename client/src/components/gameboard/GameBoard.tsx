@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Letter } from './Letter';
-import './GameBoard.css';
 import { GameData, GameGrid } from '../../@types';
 import { GameOptions } from './GameOptions';
 import { useLocalStorageState } from '../../hooks/useLocalStorageState';
