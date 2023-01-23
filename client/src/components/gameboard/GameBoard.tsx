@@ -154,33 +154,36 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
   }
 
   return (
-    <div className="gameContainer">
-      <div
-        className="gameGrid"
-        style={{
-          gridTemplateColumns: `${100 / grid!.length}%`.repeat(grid!.length),
-        }}
-        onMouseUp={() => handleMouseUp(grid!.length)}
-      >
-        {grid!.map((row, y) =>
-          row.map((column, x) => (
-            <Letter
-              key={`${x},${y}`}
-              letter={column}
-              selected={selectedLetters![y][x]}
-              isNewestLetter={
-                letterPath[0] &&
-                letterPath[letterPath.length - 1][0] === y &&
-                letterPath[letterPath.length - 1][1] === x
-              }
-              handleMouseDown={() => handleMouseDown(y, x)}
-              handleMouseOver={() => handleMouseOver(y, x)}
-            />
-          ))
-        )}
+    <div className="flex flex-col md:flex-row m-2">
+      <div className="mr-8">
+        <div
+          className="grid"
+          style={{
+            // gridTemplateColumns: `${100 / grid!.length}%`.repeat(grid!.length),
+            gridTemplateColumns: '6rem '.repeat(grid!.length),
+          }}
+          onMouseUp={() => handleMouseUp(grid!.length)}
+        >
+          {grid!.map((row, y) =>
+            row.map((column, x) => (
+              <Letter
+                key={`${x},${y}`}
+                letter={column}
+                selected={selectedLetters![y][x]}
+                isNewestLetter={
+                  letterPath[0] &&
+                  letterPath[letterPath.length - 1][0] === y &&
+                  letterPath[letterPath.length - 1][1] === x
+                }
+                handleMouseDown={() => handleMouseDown(y, x)}
+                handleMouseOver={() => handleMouseOver(y, x)}
+              />
+            ))
+          )}
+        </div>
         <div>selected word: {selectedWord}</div>
       </div>
-      <div className="gameStatsContainer">
+      <div>
         <div>
           Time remaining:{' '}
           <strong>
@@ -200,7 +203,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
           Score: <strong>{score}</strong>
         </div>
         Found words:
-        <ul className="foundWordsList">
+        <ul>
           {foundWords.map((word) => (
             <li key={word}>{word}</li>
           ))}
