@@ -1,3 +1,21 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+  .btn-primary {
+    @apply bg-indigo-700 text-white border border-indigo-800 rounded-lg drop-shadow-lg cursor-pointer
+  }
+
+  .btn-primary:hover {
+    @apply bg-indigo-500 border-indigo-600
+  }
+
+  .btn-primary:active {
+    @apply bg-indigo-400 border-indigo-500
+  }
+
+  .btn-secondary {
+    @apply bg-white text-indigo-800 border border-indigo-700 rounded-lg drop-shadow-lg cursor-pointer
+  }
+}
