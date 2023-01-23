@@ -21,8 +21,8 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
   const [gameId, setGameId] = useState<string | null>(null);
   return (
     <>
-      <h2 className="text-xl font-semibold">Game options:</h2>
-      <form className="flex flex-col px-2 max-w-md bg-gray-100 border border-gray-400 rounded-md">
+      <h2 className="mx-2 text-xl font-semibold">Game options:</h2>
+      <form className="flex flex-col mx-2 px-2 max-w-md bg-gray-100 border border-gray-400 rounded-md">
         <label className="my-2 flex justify-evenly">
           <span className="inline-block">Game size:</span>
           <input
