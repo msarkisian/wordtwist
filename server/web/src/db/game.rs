@@ -1,8 +1,8 @@
 use rusqlite::{Connection, Result};
 use uuid::Uuid;
-use wordtwist::game::GeneratedGame;
+use wordtwist::game::Game;
 
-pub fn get_game_by_id(conn: &mut Connection, id: Uuid) -> Result<GeneratedGame> {
+pub fn get_game_by_id(conn: &mut Connection, id: Uuid) -> Result<Game> {
     conn.query_row_and_then(
         "SELECT game_data from GAMES where id=?1",
         (id.to_string(),),
@@ -10,7 +10,7 @@ pub fn get_game_by_id(conn: &mut Connection, id: Uuid) -> Result<GeneratedGame> 
     )
 }
 
-pub fn insert_game(conn: &mut Connection, game: &GeneratedGame) -> Result<Uuid> {
+pub fn insert_game(conn: &mut Connection, game: &Game) -> Result<Uuid> {
     let uuid = Uuid::new_v4();
 
     conn.execute(
@@ -29,7 +29,7 @@ mod test {
     #[test]
     fn insert_and_get() {
         let mut connection = open_db_connection();
-        let game = GeneratedGame::new(5);
+        let game = Game::new(5);
 
         let game_id = insert_game(&mut connection, &game).unwrap();
         let fetched_game = get_game_by_id(&mut connection, game_id).unwrap();

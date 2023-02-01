@@ -18,18 +18,18 @@ enum GameDirections {
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
-pub struct GeneratedGame {
+pub struct Game {
     grid: Vec<Vec<char>>,
     valid_words: Vec<String>,
 }
 
-impl Default for GeneratedGame {
+impl Default for Game {
     fn default() -> Self {
         Self::new(5)
     }
 }
 
-impl GeneratedGame {
+impl Game {
     /// Creates a new `GeneratedGame` of `size` x `size`
     pub fn new(size: usize) -> Self {
         fn calculate_valid_directions(
@@ -103,7 +103,7 @@ impl GeneratedGame {
             }
         }
 
-        GeneratedGame {
+        Game {
             valid_words: generate_wordlist_from_game(&grid),
             grid,
         }
@@ -124,7 +124,7 @@ mod tests {
 
     #[test]
     fn test_game_generation() {
-        let _x = GeneratedGame::new(5);
-        let _y = GeneratedGame::new(4);
+        let _x = Game::new(5);
+        let _y = Game::new(4);
     }
 }
