@@ -59,7 +59,7 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
               value="new"
               id="new"
               name="newOrId"
-              checked={!loadingGameFromId}
+              defaultChecked
               onClick={() => {
                 setLoadingGameFromId(false);
                 setGameId(null);
