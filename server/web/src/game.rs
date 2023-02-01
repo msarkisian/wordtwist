@@ -35,7 +35,7 @@ pub async fn get_new_game(Path(size): Path<usize>) -> impl IntoResponse {
     if !(3..=7).contains(&size) {
         return Err((
             StatusCode::BAD_REQUEST,
-            "Invalid game size. Games can be of size 3-8 inclusive.",
+            "Invalid game size. Games can be of size 3-7 inclusive.",
         ));
     }
     Ok((StatusCode::OK, Json(Game::new(size))))
