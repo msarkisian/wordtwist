@@ -101,7 +101,7 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
         )}
         <div className="flex justify-center">
           <input
-            className="w-28 h-12 mt-2 mb-2 bg-indigo-700 text-white rounded-lg cursor-pointer hover:bg-indigo-500 active:bg-indigo-400"
+            className="w-28 h-12 mt-2 mb-2 bg-indigo-700 text-white rounded-lg cursor-pointer hover:bg-indigo-500 active:bg-indigo-400 disabled:bg-indigo-300 disabled:cursor-default"
             type={'submit'}
             value="Start game"
             onClick={(e) => {
@@ -109,7 +109,11 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
               startGame(gameId);
             }}
             disabled={
-              size < 3 || size > 7 || remainingTime < 10 || remainingTime > 600
+              size < 3 ||
+              size > 7 ||
+              remainingTime < 10 ||
+              remainingTime > 600 ||
+              (loadingGameFromId && !gameId)
             }
           />
         </div>
