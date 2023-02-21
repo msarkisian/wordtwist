@@ -3,7 +3,9 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 use wordtwist::game::Game as GameData;
 
-use crate::db::{game::get_game_by_id, open_db_connection};
+use crate::db::{self, game::get_game_by_id, open_db_connection};
+
+pub mod daily;
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Eq)]
 pub struct Game {
@@ -21,6 +23,11 @@ impl Game {
             id: uuid.to_string(),
             data,
         }
+    }
+
+    pub fn daily(size: usize) -> Self {
+        let mut conn = open_db_connection();
+        todo!()
     }
 
     pub fn from(uuid: Uuid, data: GameData) -> Self {
