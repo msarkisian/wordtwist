@@ -3,7 +3,10 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 use wordtwist::game::Game as GameData;
 
-use crate::db::{self, game::get_game_by_id, open_db_connection};
+use crate::db::{
+    game::{get_game_by_id, set_daily, try_get_daily},
+    open_db_connection,
+};
 
 pub mod daily;
 
@@ -12,6 +15,8 @@ pub struct Game {
     id: String,
     data: GameData,
 }
+
+pub struct DailyGame(GameData);
 
 impl Game {
     pub fn new(size: usize) -> Self {
@@ -25,16 +30,23 @@ impl Game {
         }
     }
 
-    pub fn daily(size: usize) -> Self {
-        let mut conn = open_db_connection();
-        todo!()
-    }
-
     pub fn from(uuid: Uuid, data: GameData) -> Self {
         Self {
             id: uuid.to_string(),
             data,
         }
+    }
+}
+
+impl DailyGame {
+    pub fn get(size: usize) -> Self {
+        let mut conn = open_db_connection();
+        Self(try_get_daily(&mut conn).unwrap_or_else(|_| {
+            let game = Game::new(size);
+            set_daily(&mut conn, Uuid::parse_str(game.id.as_str()).unwrap())
+                .expect("error adding daily game to db (DailyGame::get)");
+            game.data
+        }))
     }
 }
 

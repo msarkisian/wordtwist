@@ -30,6 +30,20 @@ pub fn try_get_daily(conn: &mut Connection) -> Result<Game> {
     .map(|d| serde_json::from_str(&d).unwrap())
 }
 
+pub fn set_daily(conn: &mut Connection, id: Uuid) -> Result<()> {
+    let daily_id: Result<usize, rusqlite::Error> = conn.query_row(
+        "INSERT INTO daily (game_id) VALUES (?1) RETURNING daily.id",
+        (id.to_string(),),
+        |r| r.get(0),
+    );
+    conn.execute(
+        "INSERT INTO dates (daily_id) VALUES (?1)",
+        (daily_id.unwrap(),),
+    )
+    .expect("error adding to dates table (set_daily)");
+    Ok(())
+}
+
 #[cfg(test)]
 mod test {
     use crate::db::open_db_connection;
