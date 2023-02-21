@@ -13,6 +13,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
   const [size, setSize] = useLocalStorageState('lastSize', 5);
   const [lastTime, setLastTime] = useLocalStorageState('lastTime', 120);
   const [error, setError] = useState<string | null>(null);
+  const errorTimeout = useRef<number | undefined>(undefined);
 
   const [grid, setGrid] = useState<GameGrid | null>(null);
   const [foundWords, setFoundWords] = useState<string[]>([]);
@@ -93,6 +94,12 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
     if (res.status !== 200) {
       const errorMessage = await res.text();
       setError(errorMessage);
+      if (errorTimeout.current) {
+        clearTimeout(errorTimeout.current);
+      }
+      errorTimeout.current = setTimeout(() => {
+        setError(null);
+      }, 5000);
       return;
     }
     const jsonRes: GameData = await res.json();
