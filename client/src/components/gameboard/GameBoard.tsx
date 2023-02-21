@@ -12,6 +12,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
   const [gameId, setGameId] = useState<string | null>(null);
   const [size, setSize] = useLocalStorageState('lastSize', 5);
   const [lastTime, setLastTime] = useLocalStorageState('lastTime', 120);
+  const [error, setError] = useState<string | null>(null);
 
   const [grid, setGrid] = useState<GameGrid | null>(null);
   const [foundWords, setFoundWords] = useState<string[]>([]);
@@ -89,6 +90,11 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
     if (id) url = `/game/id/${id}`;
     else url = `/game/${size}`;
     const res = await fetch(url);
+    if (res.status !== 200) {
+      const errorMessage = await res.text();
+      setError(errorMessage);
+      return;
+    }
     const jsonRes: GameData = await res.json();
     setGameId(jsonRes.id);
     setGrid(jsonRes.data.grid);
@@ -137,6 +143,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
         size={size}
         setSize={setSize}
         startGame={startGame}
+        error={error}
       />
     );
   }

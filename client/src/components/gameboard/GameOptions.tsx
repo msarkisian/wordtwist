@@ -7,6 +7,7 @@ interface GameOptionsProps {
   size: number;
   setSize: (size: number) => void;
   startGame: (id: null | string) => void;
+  error: string | null;
 }
 
 export const GameOptions: React.FC<GameOptionsProps> = ({
@@ -16,6 +17,7 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
   size,
   setSize,
   startGame,
+  error,
 }) => {
   const [loadingGameFromId, setLoadingGameFromId] = useState(false);
   const [gameId, setGameId] = useState<string | null>(null);
@@ -92,9 +94,14 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
             />
           </div>
         )}
+        {error && (
+          <p className="text-red-600 font-semibold text-center">
+            Error: {error}
+          </p>
+        )}
         <div className="flex justify-center">
           <input
-            className="w-28 h-12 mt-6 mb-2 bg-indigo-700 text-white rounded-lg cursor-pointer hover:bg-indigo-500 active:bg-indigo-400"
+            className="w-28 h-12 mt-2 mb-2 bg-indigo-700 text-white rounded-lg cursor-pointer hover:bg-indigo-500 active:bg-indigo-400"
             type={'submit'}
             value="Start game"
             onClick={(e) => {
