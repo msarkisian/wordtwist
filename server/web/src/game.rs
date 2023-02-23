@@ -39,10 +39,10 @@ impl Game {
 }
 
 impl DailyGame {
-    pub fn get(size: usize) -> Self {
+    pub fn get() -> Self {
         let mut conn = open_db_connection();
         Self(try_get_daily(&mut conn).unwrap_or_else(|_| {
-            let game = Game::new(size);
+            let game = Game::new(4);
             set_daily(&mut conn, Uuid::parse_str(game.id.as_str()).unwrap())
                 .expect("error adding daily game to db (DailyGame::get)");
             game.data
@@ -80,4 +80,17 @@ pub async fn get_existing_game_by_id(Path(id): Path<String>) -> impl IntoRespons
     };
 
     Ok((StatusCode::OK, Json(Game::from(id, game_data))))
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn test_daily_game() {
+        let g1 = DailyGame::get();
+        let g2 = DailyGame::get();
+
+        assert_eq!(g1.0, g2.0);
+    }
 }
