@@ -3,7 +3,7 @@ use uuid::Uuid;
 
 use crate::{
     db::{game::get_game_by_id, open_db_connection},
-    game::Game,
+    game::{DailyGame, Game},
 };
 
 pub async fn get_new_game(Path(size): Path<usize>) -> impl IntoResponse {
@@ -36,4 +36,8 @@ pub async fn get_existing_game_by_id(Path(id): Path<String>) -> impl IntoRespons
     };
 
     Ok((StatusCode::OK, Json(Game::from(id, game_data))))
+}
+
+pub async fn get_daily_game() -> impl IntoResponse {
+    (StatusCode::OK, Json(DailyGame::get().0))
 }

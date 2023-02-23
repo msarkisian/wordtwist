@@ -13,7 +13,7 @@ pub struct Game {
     data: GameData,
 }
 
-pub struct DailyGame(GameData);
+pub struct DailyGame(pub GameData);
 
 impl Game {
     pub fn new(size: usize) -> Self {
