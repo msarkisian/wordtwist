@@ -5,7 +5,7 @@ CREATE TABLE daily (
 );
 
 CREATE TABLE dates (
-  date TEXT PRIMARY KEY
-  daily_id INTEGER
+  date TEXT PRIMARY KEY,
+  daily_id INTEGER,
   FOREIGN KEY(daily_id) REFERENCES daily(id)
 );
