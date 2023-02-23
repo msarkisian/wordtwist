@@ -1,10 +1,11 @@
 mod db;
 mod game;
+mod routes;
 
 use axum::{routing::get, Router};
 use axum_extra::routing::SpaRouter;
 use db::open_db_connection;
-use game::{get_existing_game_by_id, get_new_game};
+use routes::{get_existing_game_by_id, get_new_game};
 
 #[tokio::main]
 async fn main() {
