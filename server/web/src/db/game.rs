@@ -1,9 +1,11 @@
 use chrono::Utc;
 use rusqlite::{Connection, Result};
 use uuid::Uuid;
-use wordtwist::game::Game;
+use wordtwist::game::Game as GameData;
 
-pub fn get_game_by_id(conn: &mut Connection, id: Uuid) -> Result<Game> {
+use crate::game::Game;
+
+pub fn get_game_by_id(conn: &mut Connection, id: Uuid) -> Result<GameData> {
     conn.query_row_and_then(
         "SELECT game_data from GAMES where id=?1",
         (id.to_string(),),
@@ -11,7 +13,7 @@ pub fn get_game_by_id(conn: &mut Connection, id: Uuid) -> Result<Game> {
     )
 }
 
-pub fn insert_game(conn: &mut Connection, game: &Game) -> Result<Uuid> {
+pub fn insert_game(conn: &mut Connection, game: &GameData) -> Result<Uuid> {
     let uuid = Uuid::new_v4();
 
     conn.execute(
@@ -24,10 +26,14 @@ pub fn insert_game(conn: &mut Connection, game: &Game) -> Result<Uuid> {
 pub fn try_get_daily(conn: &mut Connection) -> Result<Game> {
     let date = Utc::now().date_naive().to_string();
     conn.query_row(
-        "SELECT games.game_data FROM dates JOIN daily ON dates.daily_id = daily.id JOIN games ON daily.game_id = games.id WHERE date = ?1",
+        "SELECT games.id, games.game_data FROM dates JOIN daily ON dates.daily_id = daily.id JOIN games ON daily.game_id = games.id WHERE date = ?1",
         (date,),
-        |r| r.get::<usize, String>(0))
-    .map(|d| serde_json::from_str(&d).unwrap())
+        |r| {
+            Ok(Game {
+                id: r.get(0)?,
+                data: serde_json::from_str(&r.get::<usize, String>(1)?).unwrap()
+            }
+            )})
 }
 
 pub fn set_daily(conn: &mut Connection, id: Uuid) -> Result<()> {
@@ -54,7 +60,7 @@ mod test {
     #[test]
     fn insert_and_get() {
         let mut connection = open_db_connection();
-        let game = Game::new(5);
+        let game = GameData::new(5);
 
         let game_id = insert_game(&mut connection, &game).unwrap();
         let fetched_game = get_game_by_id(&mut connection, game_id).unwrap();

@@ -9,11 +9,11 @@ use crate::db::{
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Eq)]
 pub struct Game {
-    id: String,
-    data: GameData,
+    pub(crate) id: String,
+    pub(crate) data: GameData,
 }
 
-pub struct DailyGame(pub GameData);
+pub struct DailyGame(pub Game);
 
 impl Game {
     pub fn new(size: usize) -> Self {
@@ -42,7 +42,7 @@ impl DailyGame {
             let game = Game::new(4);
             set_daily(&mut conn, Uuid::parse_str(game.id.as_str()).unwrap())
                 .expect("error adding daily game to db (DailyGame::get)");
-            game.data
+            game
         }))
     }
 }
@@ -56,6 +56,6 @@ mod test {
         let g1 = DailyGame::get();
         let g2 = DailyGame::get();
 
-        assert_eq!(g1.0, g2.0);
+        assert_eq!(g1.0.data, g2.0.data);
     }
 }
