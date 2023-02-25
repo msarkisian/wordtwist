@@ -86,9 +86,10 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
     setLetterPath([]);
   };
 
-  const startGame = async (id: string | null) => {
+  const startGame = async (daily: boolean, id: string | null) => {
     let url: string;
-    if (id) url = `/game/id/${id}`;
+    if (daily) url = 'game/daily';
+    else if (id) url = `/game/id/${id}`;
     else url = `/game/${size}`;
     const res = await fetch(url);
     if (res.status !== 200) {

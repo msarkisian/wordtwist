@@ -6,7 +6,7 @@ interface GameOptionsProps {
   setLastTime: (time: number) => void;
   size: number;
   setSize: (size: number) => void;
-  startGame: (id: null | string) => void;
+  startGame: (daily: boolean, id: null | string) => void;
   error: string | null;
 }
 
@@ -101,12 +101,28 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
         )}
         <div className="flex justify-center">
           <input
-            className="w-28 h-12 mt-2 mb-2 bg-indigo-700 text-white rounded-lg cursor-pointer hover:bg-indigo-500 active:bg-indigo-400 disabled:bg-indigo-300 disabled:cursor-default"
+            className="w-40 h-12 m-2 bg-indigo-700 text-white rounded-lg cursor-pointer hover:bg-indigo-500 active:bg-indigo-400 disabled:bg-indigo-300 disabled:cursor-default"
             type={'submit'}
-            value="Start game"
+            value="Create new game"
             onClick={(e) => {
               e.preventDefault();
-              startGame(gameId);
+              startGame(false, gameId);
+            }}
+            disabled={
+              size < 3 ||
+              size > 7 ||
+              remainingTime < 10 ||
+              remainingTime > 600 ||
+              (loadingGameFromId && !gameId)
+            }
+          />
+          <input
+            className="w-48 h-12 m-2 bg-indigo-700 text-white rounded-lg cursor-pointer hover:bg-indigo-500 active:bg-indigo-400 disabled:bg-indigo-300 disabled:cursor-default"
+            type={'submit'}
+            value="Play today's daily game"
+            onClick={(e) => {
+              e.preventDefault();
+              startGame(true, null);
             }}
             disabled={
               size < 3 ||
