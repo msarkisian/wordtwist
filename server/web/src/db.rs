@@ -5,7 +5,7 @@ pub mod game;
 #[cfg(test)]
 const DB_PATH: &str = "./sql.db3";
 #[cfg(not(test))]
-const DB_PATH: &str = ".server/web/sql.db3";
+const DB_PATH: &str = "./server/web/sql.db3";
 const FALLBACK_DB_PATH: &str = "./web/sql.db3";
 
 pub fn open_db_connection() -> Connection {
