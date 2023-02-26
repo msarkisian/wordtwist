@@ -103,7 +103,7 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
           <input
             className="w-40 h-12 m-2 bg-indigo-700 text-white rounded-lg cursor-pointer hover:bg-indigo-500 active:bg-indigo-400 disabled:bg-indigo-300 disabled:cursor-default"
             type={'submit'}
-            value="Create new game"
+            value={loadingGameFromId ? 'Load game' : 'Create new game'}
             onClick={(e) => {
               e.preventDefault();
               startGame(false, gameId);
@@ -116,22 +116,18 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
               (loadingGameFromId && !gameId)
             }
           />
-          <input
-            className="w-48 h-12 m-2 bg-indigo-700 text-white rounded-lg cursor-pointer hover:bg-indigo-500 active:bg-indigo-400 disabled:bg-indigo-300 disabled:cursor-default"
-            type={'submit'}
-            value="Play today's daily game"
-            onClick={(e) => {
-              e.preventDefault();
-              startGame(true, null);
-            }}
-            disabled={
-              size < 3 ||
-              size > 7 ||
-              remainingTime < 10 ||
-              remainingTime > 600 ||
-              (loadingGameFromId && !gameId)
-            }
-          />
+          {!loadingGameFromId && (
+            <input
+              className="w-48 h-12 m-2 bg-indigo-700 text-white rounded-lg cursor-pointer hover:bg-indigo-500 active:bg-indigo-400 disabled:bg-indigo-300 disabled:cursor-default"
+              type={'submit'}
+              value="Play today's daily game"
+              onClick={(e) => {
+                e.preventDefault();
+                startGame(true, null);
+              }}
+              disabled={remainingTime < 10 || remainingTime > 600}
+            />
+          )}
         </div>
       </form>
     </>
