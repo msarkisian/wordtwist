@@ -169,12 +169,11 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
   }
 
   return (
-    <div className="flex flex-col md:flex-row m-2">
+    <div className="flex flex-col justify-center md:flex-row m-2 mt-8">
       <div className="mr-8">
         <div
           className="grid"
           style={{
-            // gridTemplateColumns: `${100 / grid!.length}%`.repeat(grid!.length),
             gridTemplateColumns: '6rem '.repeat(grid!.length),
           }}
           onMouseUp={() => handleMouseUp(grid!.length)}
@@ -198,7 +197,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
         </div>
         <div>selected word: {selectedWord}</div>
       </div>
-      <div>
+      <div className="w-48">
         <div>
           Time remaining:{' '}
           <strong>
@@ -218,9 +217,11 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
           Score: <strong>{score}</strong>
         </div>
         Found words:
-        <ul>
+        <ul className="list-disc list-inside">
           {foundWords.map((word) => (
-            <li key={word}>{word}</li>
+            <li className="text-sm" key={word}>
+              {word}
+            </li>
           ))}
         </ul>
       </div>
