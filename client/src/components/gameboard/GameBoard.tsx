@@ -86,7 +86,12 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
     setLetterPath([]);
   };
 
-  const startGame = async (daily: boolean, id: string | null) => {
+  const startGame = async (
+    daily: boolean,
+    id: string | null,
+    size: number,
+    time: number
+  ) => {
     let url: string;
     if (daily) url = 'game/daily';
     else if (id) url = `/game/id/${id}`;
@@ -112,6 +117,8 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
         Array(jsonRes.data.grid.length).fill(false)
       )
     );
+    setRemainingTime(time);
+    setLastTime(time);
     startTimer();
     setPreGame(false);
   };
@@ -146,8 +153,6 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
     return (
       <GameOptions
         remainingTime={remainingTime}
-        setRemainingTime={setRemainingTime}
-        setLastTime={setLastTime}
         size={size}
         setSize={setSize}
         startGame={startGame}

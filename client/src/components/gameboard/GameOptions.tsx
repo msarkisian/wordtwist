@@ -2,24 +2,26 @@ import React, { useState } from 'react';
 
 interface GameOptionsProps {
   remainingTime: number;
-  setRemainingTime: (time: number) => void;
-  setLastTime: (time: number) => void;
   size: number;
   setSize: (size: number) => void;
-  startGame: (daily: boolean, id: null | string) => void;
+  startGame: (
+    daily: boolean,
+    id: null | string,
+    size: number,
+    time: number
+  ) => void;
   error: string | null;
 }
 
 export const GameOptions: React.FC<GameOptionsProps> = ({
   remainingTime,
-  setRemainingTime,
-  setLastTime,
   size,
   setSize,
   startGame,
   error,
 }) => {
   const [loadingGameFromId, setLoadingGameFromId] = useState(false);
+  const [time, setTime] = useState(remainingTime);
   const [gameId, setGameId] = useState<string | null>(null);
   return (
     <>
@@ -45,12 +47,11 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
               className="w-24"
               type="number"
               name="time"
-              value={remainingTime}
+              value={time}
               min="10"
               max="600"
               onChange={(e) => {
-                setRemainingTime(Number(e.target.value));
-                setLastTime(Number(e.target.value));
+                setTime(Number(e.target.value));
               }}
             />
           </label>
@@ -107,7 +108,7 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
               value={loadingGameFromId ? 'Load game' : 'Create new game'}
               onClick={(e) => {
                 e.preventDefault();
-                startGame(false, gameId);
+                startGame(false, gameId, size, time);
               }}
               disabled={
                 size < 3 ||
@@ -124,7 +125,7 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
                 value="Play today's daily game"
                 onClick={(e) => {
                   e.preventDefault();
-                  startGame(true, null);
+                  startGame(true, null, 4, remainingTime);
                 }}
                 disabled={remainingTime < 10 || remainingTime > 600}
               />
