@@ -116,6 +116,10 @@ impl Game {
     pub fn valid_words(&self) -> &Vec<String> {
         &self.valid_words
     }
+
+    pub fn validate(&self, word: &str) -> bool {
+        self.valid_words.binary_search(&word.to_string()).is_ok()
+    }
 }
 
 #[cfg(test)]
@@ -126,5 +130,26 @@ mod tests {
     fn test_game_generation() {
         let _x = Game::new(5);
         let _y = Game::new(4);
+    }
+
+    #[test]
+    fn wordlist_validation() {
+        let game = Game {
+            grid: vec![vec![]],
+            valid_words: vec![
+                "bar".to_string(),
+                "baz".to_string(),
+                "foo".to_string(),
+                "qux".to_string(),
+            ],
+        };
+        assert!(game.validate("foo"));
+        assert!(game.validate("bar"));
+        assert!(game.validate("baz"));
+        assert!(game.validate("qux"));
+
+        let game = Game::new(5);
+        assert!(game.validate(&game.valid_words[2]));
+        assert!(game.validate(&game.valid_words[game.valid_words().len() - 1]));
     }
 }
