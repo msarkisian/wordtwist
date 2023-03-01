@@ -33,34 +33,34 @@ impl Game {
     /// Creates a new `GeneratedGame` of `size` x `size`
     pub fn new(size: usize) -> Self {
         fn calculate_valid_directions(
-            grid: &Vec<Vec<char>>,
+            grid: &Vec<Vec<Option<char>>>,
             (y, x): &(usize, usize),
         ) -> Vec<GameDirections> {
             let grid_length = grid.len();
             let mut output = Vec::new();
 
-            if *y > 0 && grid[*y - 1][*x] == '0' {
+            if *y > 0 && grid[*y - 1][*x] == None {
                 output.push(GameDirections::Up);
             }
-            if *y > 0 && *x > 0 && grid[*y - 1][*x - 1] == '0' {
+            if *y > 0 && *x > 0 && grid[*y - 1][*x - 1] == None {
                 output.push(GameDirections::UpLeft);
             }
-            if *y > 0 && *x < grid_length - 1 && grid[*y - 1][*x + 1] == '0' {
+            if *y > 0 && *x < grid_length - 1 && grid[*y - 1][*x + 1] == None {
                 output.push(GameDirections::UpRight);
             }
-            if *y < grid_length - 1 && grid[*y + 1][*x] == '0' {
+            if *y < grid_length - 1 && grid[*y + 1][*x] == None {
                 output.push(GameDirections::Down);
             }
-            if *y < grid_length - 1 && *x > 0 && grid[*y + 1][*x - 1] == '0' {
+            if *y < grid_length - 1 && *x > 0 && grid[*y + 1][*x - 1] == None {
                 output.push(GameDirections::DownLeft);
             }
-            if *y < grid_length - 1 && *x < grid_length - 1 && grid[*y + 1][*x + 1] == '0' {
+            if *y < grid_length - 1 && *x < grid_length - 1 && grid[*y + 1][*x + 1] == None {
                 output.push(GameDirections::DownRight);
             }
-            if *x > 0 && grid[*y][*x - 1] == '0' {
+            if *x > 0 && grid[*y][*x - 1] == None {
                 output.push(GameDirections::Left);
             }
-            if *x < grid_length - 1 && grid[*y][*x + 1] == '0' {
+            if *x < grid_length - 1 && grid[*y][*x + 1] == None {
                 output.push(GameDirections::Right);
             }
             output
@@ -73,7 +73,7 @@ impl Game {
         let target_word = get_random_n_length_word(target_word_size);
 
         let mut grid = 'outer: loop {
-            let mut grid = vec![vec!['0'; size]; size];
+            let mut grid = vec![vec![None; size]; size];
             let start_point = (
                 (0..size).into_iter().choose(&mut thread_rng()).unwrap(),
                 (0..size).into_iter().choose(&mut thread_rng()).unwrap(),
@@ -81,7 +81,7 @@ impl Game {
             let mut point = start_point;
 
             for character in target_word.chars() {
-                grid[point.0][point.1] = character;
+                grid[point.0][point.1] = Some(character);
                 match calculate_valid_directions(&grid, &point).choose(&mut thread_rng()) {
                     None => continue 'outer,
                     Some(GameDirections::Up) => point = (point.0 - 1, point.1),
@@ -98,10 +98,15 @@ impl Game {
         };
 
         for c in grid.iter_mut().flatten() {
-            if *c == '0' {
-                *c = get_random_letter()
+            if *c == None {
+                *c = Some(get_random_letter())
             }
         }
+
+        let grid = grid
+            .into_iter()
+            .map(|r| r.into_iter().map(|c| c.unwrap()).collect())
+            .collect();
 
         Game {
             valid_words: generate_wordlist_from_game(&grid),
