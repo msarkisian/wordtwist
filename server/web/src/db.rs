@@ -1,6 +1,7 @@
 use rusqlite::Connection;
 
 pub mod game;
+pub mod user;
 
 #[cfg(test)]
 const DB_PATH: &str = "./sql.db3";
