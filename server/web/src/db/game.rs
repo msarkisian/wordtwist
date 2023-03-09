@@ -38,14 +38,14 @@ pub fn try_get_daily(conn: &mut Connection) -> Result<Game> {
 
 pub fn set_daily(conn: &mut Connection, id: Uuid) -> Result<()> {
     let date = Utc::now().date_naive().to_string();
-    let daily_id: Result<usize, rusqlite::Error> = conn.query_row(
+    let daily_id: usize = conn.query_row(
         "INSERT INTO daily (game_id) VALUES (?1) RETURNING daily.id",
         (id.to_string(),),
         |r| r.get(0),
-    );
+    )?;
     conn.execute(
         "INSERT INTO dates (date, daily_id) VALUES (?1, ?2)",
-        (date, daily_id.unwrap()),
+        (date, daily_id),
     )
     .expect("error adding to dates table (set_daily)");
     Ok(())
