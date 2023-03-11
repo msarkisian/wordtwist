@@ -39,44 +39,41 @@ impl Game {
             let grid_length = grid.len();
             let mut output = Vec::new();
 
-            if *y > 0 && grid[*y - 1][*x] == None {
+            if *y > 0 && grid[*y - 1][*x].is_none() {
                 output.push(GameDirections::Up);
             }
-            if *y > 0 && *x > 0 && grid[*y - 1][*x - 1] == None {
+            if *y > 0 && *x > 0 && grid[*y - 1][*x - 1].is_none() {
                 output.push(GameDirections::UpLeft);
             }
-            if *y > 0 && *x < grid_length - 1 && grid[*y - 1][*x + 1] == None {
+            if *y > 0 && *x < grid_length - 1 && grid[*y - 1][*x + 1].is_none() {
                 output.push(GameDirections::UpRight);
             }
-            if *y < grid_length - 1 && grid[*y + 1][*x] == None {
+            if *y < grid_length - 1 && grid[*y + 1][*x].is_none() {
                 output.push(GameDirections::Down);
             }
-            if *y < grid_length - 1 && *x > 0 && grid[*y + 1][*x - 1] == None {
+            if *y < grid_length - 1 && *x > 0 && grid[*y + 1][*x - 1].is_none() {
                 output.push(GameDirections::DownLeft);
             }
-            if *y < grid_length - 1 && *x < grid_length - 1 && grid[*y + 1][*x + 1] == None {
+            if *y < grid_length - 1 && *x < grid_length - 1 && grid[*y + 1][*x + 1].is_none() {
                 output.push(GameDirections::DownRight);
             }
-            if *x > 0 && grid[*y][*x - 1] == None {
+            if *x > 0 && grid[*y][*x - 1].is_none() {
                 output.push(GameDirections::Left);
             }
-            if *x < grid_length - 1 && grid[*y][*x + 1] == None {
+            if *x < grid_length - 1 && grid[*y][*x + 1].is_none() {
                 output.push(GameDirections::Right);
             }
             output
         }
 
-        let target_word_size = (2 * size..3 * size)
-            .into_iter()
-            .choose(&mut thread_rng())
-            .unwrap();
+        let target_word_size = (2 * size..3 * size).choose(&mut thread_rng()).unwrap();
         let target_word = get_random_n_length_word(target_word_size);
 
         let mut grid = 'outer: loop {
             let mut grid = vec![vec![None; size]; size];
             let start_point = (
-                (0..size).into_iter().choose(&mut thread_rng()).unwrap(),
-                (0..size).into_iter().choose(&mut thread_rng()).unwrap(),
+                (0..size).choose(&mut thread_rng()).unwrap(),
+                (0..size).choose(&mut thread_rng()).unwrap(),
             );
             let mut point = start_point;
 
@@ -98,7 +95,7 @@ impl Game {
         };
 
         for c in grid.iter_mut().flatten() {
-            if *c == None {
+            if c.is_none() {
                 *c = Some(get_random_letter())
             }
         }
