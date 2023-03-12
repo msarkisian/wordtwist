@@ -69,5 +69,7 @@ mod test {
         let add_user_id = add_user(&mut conn, "test", "test@test.com", "hunter2").unwrap();
         let validate_user_id = validate_user(&mut conn, "test", "hunter2").unwrap();
         assert_eq!(add_user_id, validate_user_id);
+        assert!(validate_user(&mut conn, "test", "asdas").is_err());
+        assert!(validate_user(&mut conn, "asdas", "test").is_err());
     }
 }
