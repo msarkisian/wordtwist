@@ -5,6 +5,7 @@ use argon2::{
 };
 use rusqlite::Connection;
 
+#[derive(Debug, PartialEq, Eq)]
 pub struct UserID(pub usize);
 
 pub fn add_user(
@@ -46,4 +47,27 @@ pub fn validate_user(conn: &mut Connection, username: &str, password: &str) -> R
     }
 
     Ok(UserID(id.unwrap()))
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn test_create_validate_user() {
+        let mut conn = Connection::open_in_memory().unwrap();
+        conn.execute(
+            "CREATE TABLE users (
+                    id INTEGER PRIMARY KEY,
+                    email TEXT UNIQUE,
+                    username TEXT UNIQUE,
+                    password_hash TEXT
+                );",
+            (),
+        )
+        .unwrap();
+        let add_user_id = add_user(&mut conn, "test", "test@test.com", "hunter2").unwrap();
+        let validate_user_id = validate_user(&mut conn, "test", "hunter2").unwrap();
+        assert_eq!(add_user_id, validate_user_id);
+    }
 }
