@@ -5,7 +5,7 @@ use argon2::{
 };
 use rusqlite::Connection;
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub struct UserID(pub usize);
 
 pub fn add_user(
