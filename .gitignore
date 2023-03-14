@@ -1,6 +1,7 @@
 ### SERVER
 server/target
 server/web/sql.db3
+server/web/cookie_key
 
 ### CLIENT
 # Logs
