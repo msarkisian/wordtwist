@@ -7,7 +7,7 @@ edition = "2021"
 
 [dependencies]
 axum = "0.6.1"
-axum-extra = { version = "0.4.2", features = ["spa"] }
+axum-extra = { version = "0.4.2", features = ["spa", "cookie", "cookie-signed"] }
 tokio = {version = "1", features = ["full"]}
 wordtwist = { path = "../wordtwist"}
 serde = { version = "1.0", features = ["derive"] }
@@ -17,5 +17,3 @@ uuid = { version = "1.2.2", features = ["v4", "fast-rng"]}
 chrono = "0.4.23"
 argon2 = { version = "0.5.0", features = ["password-hash"] }
 anyhow = "1.0.69"
-async-session = "3.0.0"
-async-redis-session = "0.2.2"

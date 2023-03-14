@@ -1,17 +1,13 @@
-use async_redis_session::RedisSessionStore;
-use async_session::{Session, SessionStore};
-use axum::{
-    extract::State,
-    http::{self, HeaderMap, StatusCode},
-    response::IntoResponse,
-    Json,
-};
+use axum::{http::StatusCode, response::IntoResponse, Json};
+use axum_extra::extract::{cookie::Cookie, SignedCookieJar};
 use serde::Deserialize;
 
 use crate::db::{
     open_db_connection,
     user::{add_user, validate_user},
 };
+
+const SESSION_COOKIE_KEY: &str = "uid";
 
 #[derive(Deserialize)]
 struct AddUserDTO {
@@ -53,7 +49,7 @@ pub async fn create_new_user(Json(payload): Json<serde_json::Value>) -> impl Int
 }
 
 pub async fn login_user(
-    State(store): State<RedisSessionStore>,
+    jar: SignedCookieJar,
     Json(payload): Json<serde_json::Value>,
 ) -> impl IntoResponse {
     let data: LoginDTO = match serde_json::from_value(payload) {
@@ -70,12 +66,12 @@ pub async fn login_user(
         Ok(uid) => uid,
         Err(_) => return Err((StatusCode::UNAUTHORIZED, "Invalid username or password")),
     };
-    let mut session = Session::new();
-    session.insert("uid", uid.0).unwrap();
+    Ok((
+        StatusCode::OK,
+        jar.add(Cookie::new(SESSION_COOKIE_KEY, uid.0.to_string())),
+    ))
+}
 
-    let cookie_value = store.store_session(session).await.unwrap().unwrap();
-    let mut headers = HeaderMap::new();
-    headers.insert(http::header::SET_COOKIE, cookie_value.parse().unwrap());
-
-    Ok((StatusCode::OK, headers))
+pub async fn get_login(jar: SignedCookieJar) -> impl IntoResponse {
+    todo!()
 }
