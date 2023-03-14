@@ -73,5 +73,9 @@ pub async fn login_user(
 }
 
 pub async fn get_login(jar: SignedCookieJar) -> impl IntoResponse {
-    todo!()
+    match jar.get(SESSION_COOKIE_KEY) {
+        Some(_) => (),
+        None => return Err((StatusCode::UNAUTHORIZED, "You are not currently logged in")),
+    };
+    Ok(StatusCode::OK)
 }

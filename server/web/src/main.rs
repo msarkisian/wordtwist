@@ -11,7 +11,7 @@ use axum_extra::{extract::cookie::Key, routing::SpaRouter};
 use db::open_db_connection;
 use routes::{
     game::{get_daily_game, get_existing_game_by_id, get_new_game},
-    user::{create_new_user, login_user},
+    user::{create_new_user, get_login, login_user},
 };
 
 const KEY_STR: &[u8] = include_bytes!("../cookie_key");
@@ -41,7 +41,7 @@ async fn main() {
         .route("/game/id/:id", get(get_existing_game_by_id))
         .route("/game/daily", get(get_daily_game))
         .route("/user", post(create_new_user))
-        .route("/login", post(login_user))
+        .route("/login", post(login_user).get(get_login))
         .with_state(state);
 
     axum::Server::bind(&"127.0.0.1:8080".parse().unwrap())
