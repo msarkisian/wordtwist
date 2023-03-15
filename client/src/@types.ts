@@ -7,8 +7,3 @@ export type GameData = {
     valid_words: string[];
   };
 };
-
-export type User = {
-  username: string;
-  id: number;
-};
