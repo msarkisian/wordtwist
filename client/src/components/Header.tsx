@@ -3,14 +3,18 @@ import { User } from '../@types';
 
 interface HeaderProps {
   user: User | null;
+  setShowLogin: (show: boolean) => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ user }) => {
+export const Header: React.FC<HeaderProps> = ({ user, setShowLogin }) => {
   return (
     <header className="h-12 flex bg-indigo-900 justify-between">
       <h1 className="text-white font-extrabold mx-4 my-auto">Wordtwist</h1>
       {!user ? (
-        <button className="btn-secondary w-16 h-3/4 mx-4 my-auto">
+        <button
+          className="btn-secondary w-16 h-3/4 mx-4 my-auto"
+          onClick={() => setShowLogin(true)}
+        >
           Log in
         </button>
       ) : (
