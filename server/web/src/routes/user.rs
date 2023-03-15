@@ -66,10 +66,10 @@ pub async fn login_user(
         Ok(uid) => uid,
         Err(_) => return Err((StatusCode::UNAUTHORIZED, "Invalid username or password")),
     };
-    Ok((
-        StatusCode::OK,
-        jar.add(Cookie::new(SESSION_COOKIE_KEY, uid.0.to_string())),
-    ))
+    let cookie = Cookie::build(SESSION_COOKIE_KEY, uid.0.to_string())
+        .http_only(true)
+        .finish();
+    Ok((StatusCode::OK, jar.add(cookie)))
 }
 
 pub async fn get_login(jar: SignedCookieJar) -> impl IntoResponse {
