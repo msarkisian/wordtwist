@@ -9,5 +9,5 @@ build_client: $(wildcard client/**/*)
 $(COOKIE_KEY):
 			openssl rand 64 > server/web/cookie_key
 
-dev: 
+dev: $(COOKIE_KEY)
 	yarn --cwd client/ run dev & cargo run --manifest-path server/Cargo.toml
