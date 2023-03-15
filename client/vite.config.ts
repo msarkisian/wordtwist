@@ -9,6 +9,12 @@ export default defineConfig({
       '/game': {
         target: 'http://127.0.0.1:8080',
       },
+      '/user': {
+        target: 'http://127.0.0.1:8080',
+      },
+      '/login': {
+        target: 'http://127.0.0.1:8080',
+      },
     },
   },
 });
