@@ -14,7 +14,9 @@ export const Header: React.FC<HeaderProps> = ({ user }) => {
           Log in
         </button>
       ) : (
-        <p>{user.username}</p>
+        <h2 className="text-white font-semibold mx-4 my-auto">
+          {user.username}
+        </h2>
       )}
     </header>
   );
