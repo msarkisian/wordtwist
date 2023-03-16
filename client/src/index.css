@@ -19,7 +19,19 @@
     @apply bg-white text-indigo-800 border border-indigo-700 rounded-lg drop-shadow-lg cursor-pointer
   }
 
+  .btn-secondary:hover {
+    @apply bg-gray-100 text-indigo-900 border border-indigo-700 rounded-lg drop-shadow-lg cursor-pointer
+  }
+
+  .btn-secondary:active {
+    @apply bg-gray-300 text-indigo-900 border border-indigo-700 rounded-lg drop-shadow-lg cursor-pointer
+  }
+
   .btn-tertiary {
     @apply text-white border border-white rounded-lg cursor-pointer
+  }
+
+  .btn-tertiary:hover {
+    @apply text-gray-200 border border-gray-200 rounded-lg cursor-pointer
   }
 }
