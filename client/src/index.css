@@ -18,4 +18,8 @@
   .btn-secondary {
     @apply bg-white text-indigo-800 border border-indigo-700 rounded-lg drop-shadow-lg cursor-pointer
   }
+
+  .btn-tertiary {
+    @apply text-white border border-white rounded-lg cursor-pointer
+  }
 }

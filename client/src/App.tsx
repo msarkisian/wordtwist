@@ -11,8 +11,9 @@ function App() {
   );
   const [showLogin, setShowLogin] = useState(false);
 
+  const loginUrl = '/login';
+
   const login = async (username: string, password: string) => {
-    const loginUrl = '/login';
     const body = { username, password };
 
     const res = await fetch(loginUrl, {
@@ -29,9 +30,20 @@ function App() {
     setUsername(username);
   };
 
+  const logout = async () => {
+    const res = await fetch(loginUrl, {
+      method: 'DELETE',
+    });
+    if (res.ok || res.status === 401) {
+      setUsername(null);
+      return;
+    }
+    throw new Error('server errored when sending logout request: ' + res);
+  };
+
   return (
     <>
-      <Header username={username} setShowLogin={setShowLogin} />
+      <Header username={username} setShowLogin={setShowLogin} logout={logout} />
       {showLogin ? <LoginRegister login={login} /> : <GameBoard />}
     </>
   );
