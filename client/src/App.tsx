@@ -28,6 +28,7 @@ function App() {
       return;
     }
     setUsername(username);
+    setShowLogin(false);
   };
 
   const logout = async () => {
