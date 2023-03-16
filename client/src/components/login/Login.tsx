@@ -2,9 +2,10 @@ import React from 'react';
 
 interface LoginProps {
   login: (username: string, password: string) => void;
+  loginError: string | null;
 }
 
-export const Login: React.FC<LoginProps> = ({ login }) => {
+export const Login: React.FC<LoginProps> = ({ login, loginError }) => {
   return (
     <form
       className="flex flex-col w-2/3 max-w-md bg-gray-200 py-2 border border-gray-400 rounded-md"
@@ -28,6 +29,7 @@ export const Login: React.FC<LoginProps> = ({ login }) => {
         type="submit"
         value="Log in"
       />
+      {loginError && <p className="m-auto mt-4 text-red-800">{loginError}</p>}
     </form>
   );
 };

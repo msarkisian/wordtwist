@@ -3,6 +3,7 @@ import { GameBoard } from './components/gameboard/GameBoard';
 import { Header } from './components/Header';
 import { LoginRegister } from './components/login/LoginRegister';
 import { useLocalStorageState } from './hooks/useLocalStorageState';
+import { useTimeoutState } from './hooks/useTimeoutState';
 
 function App() {
   const [username, setUsername] = useLocalStorageState<string | null>(
@@ -10,6 +11,7 @@ function App() {
     null
   );
   const [showLogin, setShowLogin] = useState(false);
+  const [loginError, setLoginError] = useTimeoutState<string>(10000);
 
   const loginUrl = '/login';
 
@@ -24,7 +26,8 @@ function App() {
       body: JSON.stringify(body),
     });
     if (!res.ok) {
-      // TODO pass error to component
+      let body = await res.text();
+      setLoginError(body);
       return;
     }
     setUsername(username);
@@ -45,7 +48,11 @@ function App() {
   return (
     <>
       <Header username={username} setShowLogin={setShowLogin} logout={logout} />
-      {showLogin ? <LoginRegister login={login} /> : <GameBoard />}
+      {showLogin ? (
+        <LoginRegister login={login} loginError={loginError} />
+      ) : (
+        <GameBoard />
+      )}
     </>
   );
 }
