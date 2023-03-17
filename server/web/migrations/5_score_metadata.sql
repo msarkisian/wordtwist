@@ -1,0 +1,5 @@
+ALTER TABLE scores 
+ADD COLUMN size INTEGER;
+
+ALTER TABLE scores 
+ADD COLUMN time INTEGER;
