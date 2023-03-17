@@ -19,8 +19,12 @@ pub fn insert_game(conn: &mut Connection, game: &GameData) -> Result<Uuid> {
     let uuid = Uuid::new_v4();
 
     conn.execute(
-        "INSERT INTO games (id, game_data) VALUES (?1, ?2)",
-        (uuid.to_string(), serde_json::to_string(game).unwrap()),
+        "INSERT INTO games (id, game_data, size) VALUES (?1, ?2, ?3)",
+        (
+            uuid.to_string(),
+            serde_json::to_string(game).unwrap(),
+            game.size(),
+        ),
     )?;
     Ok(uuid)
 }
@@ -85,7 +89,7 @@ mod test {
     #[test]
     fn insert_and_get() {
         let mut connection = open_db_connection();
-        let game = GameData::new(5);
+        let game = GameData::new(4);
 
         let game_id = insert_game(&mut connection, &game).unwrap();
         let fetched_game = get_game_by_id(&mut connection, game_id).unwrap();

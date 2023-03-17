@@ -111,6 +111,10 @@ impl Game {
         }
     }
 
+    pub fn size(&self) -> usize {
+        *&self.grid.len()
+    }
+
     pub fn grid(&self) -> &Vec<Vec<char>> {
         &self.grid
     }
