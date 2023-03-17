@@ -7,7 +7,7 @@ use serde::Deserialize;
 
 use crate::db::{
     open_db_connection,
-    user::{add_user, validate_user},
+    user::{add_user, validate_user, UserID},
 };
 
 const SESSION_COOKIE_KEY: &str = "uid";
@@ -77,7 +77,7 @@ pub async fn login_user(
 }
 
 pub async fn get_login(jar: SignedCookieJar) -> impl IntoResponse {
-    let Some(_) = jar.get(SESSION_COOKIE_KEY) else {
+    let Some(_) = read_user_cookie(jar) else {
          return Err((StatusCode::UNAUTHORIZED, "You are not currently logged in"));
     };
     Ok(StatusCode::NO_CONTENT)
@@ -89,4 +89,9 @@ pub async fn logout_user(jar: SignedCookieJar) -> impl IntoResponse {
         None => return Err((StatusCode::UNAUTHORIZED, "You are not currently logged in")),
     };
     Ok((StatusCode::NO_CONTENT, jar.remove(cookie)))
+}
+
+pub fn read_user_cookie(jar: SignedCookieJar) -> Option<UserID> {
+    let cookie = jar.get(SESSION_COOKIE_KEY)?;
+    Some(UserID(cookie.value().parse().ok()?))
 }
