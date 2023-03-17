@@ -1,6 +1,6 @@
 use crate::{
     db::{
-        game::{get_game_by_id, get_game_score},
+        game::{add_game_score, get_game_by_id, get_game_score},
         open_db_connection,
     },
     game::{DailyGame, Game},
@@ -8,9 +8,16 @@ use crate::{
 
 use axum::{extract::Path, http::StatusCode, response::IntoResponse, Json};
 use axum_extra::extract::SignedCookieJar;
+use serde::Deserialize;
 use uuid::Uuid;
 
 use super::user::get_uid_from_cookie;
+
+#[derive(Deserialize)]
+struct PostScoreDTO {
+    score: usize,
+    time: usize,
+}
 
 pub async fn get_new_game(Path(size): Path<usize>) -> impl IntoResponse {
     if !(3..=7).contains(&size) {
@@ -72,4 +79,32 @@ pub async fn get_score(jar: SignedCookieJar, Path(game_id): Path<String>) -> imp
         }
     };
     Ok((StatusCode::OK, score.to_string()))
+}
+
+pub async fn post_score(
+    jar: SignedCookieJar,
+    Path(game_id): Path<String>,
+    Json(payload): Json<serde_json::Value>,
+) -> impl IntoResponse {
+    let Ok(game_id) = Uuid::parse_str(&game_id) else {
+        return Err((StatusCode::BAD_REQUEST, "Invalid game id provided"))
+    };
+    let Ok(payload) = serde_json::from_value::<PostScoreDTO>(payload) else {
+        return Err((StatusCode::BAD_REQUEST, "Invalid body for PostScore"))
+    };
+    let Some(uid) = get_uid_from_cookie(jar) else {
+        return Err((StatusCode::UNAUTHORIZED, "You are not currently logged in"));
+    };
+
+    let conn = &mut open_db_connection();
+    let _ = match add_game_score(conn, game_id, uid, payload.score, payload.time) {
+        Ok(_) => (),
+        Err(_) => {
+            return Err((
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Error adding score to database",
+            ))
+        }
+    };
+    Ok(StatusCode::CREATED)
 }

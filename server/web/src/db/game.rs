@@ -115,7 +115,7 @@ mod test {
         let uid = UserID(500);
         let game_uuid = Uuid::new_v4();
 
-        add_game_score(&mut conn, game_uuid, uid, 9001, 5, 180).unwrap();
+        add_game_score(&mut conn, game_uuid, uid, 9001, 5).unwrap();
         assert_eq!(get_game_score(&mut conn, game_uuid, uid).unwrap(), 9001)
     }
 }
