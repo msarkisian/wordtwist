@@ -58,10 +58,12 @@ pub fn add_game_score(
     game_id: Uuid,
     user_id: UserID,
     score: usize,
+    size: usize,
+    time: usize,
 ) -> Result<()> {
     conn.execute(
-        "INSERT INTO scores (game_id, user_id, score) VALUES (?1, ?2, ?3)",
-        (game_id.to_string(), user_id.0, score),
+        "INSERT INTO scores (game_id, user_id, score, size, time) VALUES (?1, ?2, ?3, ?4, ?5)",
+        (game_id.to_string(), user_id.0, score, size, time),
     )?;
     Ok(())
 }
@@ -99,7 +101,9 @@ mod test {
                 id INTEGER PRIMARY KEY,
                 game_id TEXT,
                 user_id INTEGER,
-                score, INTEGER
+                score, INTEGER,
+                size INTEGER,
+                time INTEGER
             );",
             (),
         )
@@ -108,7 +112,7 @@ mod test {
         let uid = UserID(500);
         let game_uuid = Uuid::new_v4();
 
-        add_game_score(&mut conn, game_uuid, uid, 9001).unwrap();
+        add_game_score(&mut conn, game_uuid, uid, 9001, 5, 180).unwrap();
         assert_eq!(get_game_score(&mut conn, game_uuid, uid).unwrap(), 9001)
     }
 }
