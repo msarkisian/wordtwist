@@ -62,12 +62,11 @@ pub fn add_game_score(
     game_id: Uuid,
     user_id: UserID,
     score: usize,
-    size: usize,
     time: usize,
 ) -> Result<()> {
     conn.execute(
-        "INSERT INTO scores (game_id, user_id, score, size, time) VALUES (?1, ?2, ?3, ?4, ?5)",
-        (game_id.to_string(), user_id.0, score, size, time),
+        "INSERT INTO scores (game_id, user_id, score, time) VALUES (?1, ?2, ?3, ?4)",
+        (game_id.to_string(), user_id.0, score, time),
     )?;
     Ok(())
 }
