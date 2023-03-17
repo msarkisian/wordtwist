@@ -1,10 +1,16 @@
 use crate::{
-    db::{game::get_game_by_id, open_db_connection},
+    db::{
+        game::{get_game_by_id, get_game_score},
+        open_db_connection,
+    },
     game::{DailyGame, Game},
 };
 
 use axum::{extract::Path, http::StatusCode, response::IntoResponse, Json};
+use axum_extra::extract::SignedCookieJar;
 use uuid::Uuid;
+
+use super::user::get_uid_from_cookie;
 
 pub async fn get_new_game(Path(size): Path<usize>) -> impl IntoResponse {
     if !(3..=7).contains(&size) {
@@ -40,4 +46,30 @@ pub async fn get_existing_game_by_id(Path(id): Path<String>) -> impl IntoRespons
 
 pub async fn get_daily_game() -> impl IntoResponse {
     (StatusCode::OK, Json(DailyGame::get().0))
+}
+
+pub async fn get_score(jar: SignedCookieJar, Path(game_id): Path<String>) -> impl IntoResponse {
+    let Some(uid) = get_uid_from_cookie(jar) else {
+        return Err((StatusCode::UNAUTHORIZED, "You are not currently logged in"));
+    };
+    let Ok(game_id) = Uuid::parse_str(&game_id) else {
+        return Err((StatusCode::BAD_REQUEST, "Invalid game id provided"))
+    };
+    let conn = &mut open_db_connection();
+    let score = match get_game_score(conn, game_id, uid) {
+        Ok(s) => s,
+        Err(rusqlite::Error::QueryReturnedNoRows) => {
+            return Err((
+                StatusCode::NOT_FOUND,
+                "No score found for specified user and game",
+            ))
+        }
+        Err(_) => {
+            return Err((
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Error getting score from database",
+            ))
+        }
+    };
+    Ok((StatusCode::OK, score.to_string()))
 }
