@@ -28,9 +28,7 @@ export const GameResults: React.FC<GameResultsProps> = ({
         score,
         time: lastTime,
       }),
-    })
-      .then((res) => console.log('score submitted sucessfully: ' + res.status))
-      .catch((err) => console.error(`error sumbitting score: ${err}`));
+    });
   }, []);
 
   return (

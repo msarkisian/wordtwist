@@ -99,6 +99,14 @@ pub async fn post_score(
     let conn = &mut open_db_connection();
     let _ = match add_game_score(conn, game_id, uid, payload.score, payload.time) {
         Ok(_) => (),
+        Err(rusqlite::Error::SqliteFailure(e, _))
+            if e.code == rusqlite::ErrorCode::ConstraintViolation =>
+        {
+            return Err((
+                StatusCode::CONFLICT,
+                "Score for this user and game already exist in database",
+            ))
+        }
         Err(_) => {
             return Err((
                 StatusCode::INTERNAL_SERVER_ERROR,
