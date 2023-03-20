@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX idx_game_user_id ON scores (game_id, user_id);
