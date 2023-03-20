@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 interface GameResultsProps {
   gameId: string;
@@ -6,6 +6,7 @@ interface GameResultsProps {
   foundWords: string[];
   validWords: string[];
   reset: () => void;
+  lastTime: number;
 }
 
 export const GameResults: React.FC<GameResultsProps> = ({
@@ -14,8 +15,24 @@ export const GameResults: React.FC<GameResultsProps> = ({
   foundWords,
   validWords,
   reset,
+  lastTime,
 }) => {
   const [copiedId, setCopiedId] = useState(false);
+  useEffect(() => {
+    fetch(`/game/score/${gameId}`, {
+      method: 'POST',
+      headers: {
+        'Content-type': 'application/json',
+      },
+      body: JSON.stringify({
+        score,
+        time: lastTime,
+      }),
+    })
+      .then((res) => console.log('score submitted sucessfully: ' + res.status))
+      .catch((err) => console.error(`error sumbitting score: ${err}`));
+  }, []);
+
   return (
     <div className="m-2">
       <h2 className="text-lg mb-2">
