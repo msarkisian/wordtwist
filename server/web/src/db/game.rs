@@ -85,6 +85,23 @@ mod test {
 
     use super::*;
 
+    fn setup_test_db() -> Connection {
+        let conn = Connection::open_in_memory().unwrap();
+        conn.execute(
+            "CREATE TABLE scores (
+                id INTEGER PRIMARY KEY,
+                game_id TEXT,
+                user_id INTEGER,
+                score, INTEGER,
+                size INTEGER,
+                time INTEGER
+            );",
+            (),
+        )
+        .unwrap();
+        conn
+    }
+
     #[test]
     fn insert_and_get() {
         let mut connection = open_db_connection();
@@ -98,20 +115,7 @@ mod test {
 
     #[test]
     fn test_set_get_score() {
-        let mut conn = Connection::open_in_memory().unwrap();
-        conn.execute(
-            "CREATE TABLE scores (
-                id INTEGER PRIMARY KEY,
-                game_id TEXT,
-                user_id INTEGER,
-                score, INTEGER,
-                size INTEGER,
-                time INTEGER
-            );",
-            (),
-        )
-        .unwrap();
-
+        let mut conn = setup_test_db();
         let uid = UserID(500);
         let game_uuid = Uuid::new_v4();
 
