@@ -79,6 +79,14 @@ pub fn get_game_score(conn: &mut Connection, game_id: Uuid, user_id: UserID) -> 
     )
 }
 
+pub fn get_top_game_score(conn: &mut Connection, game_id: Uuid) -> Result<usize> {
+    conn.query_row(
+        "SELECT MAX(score) FROM scores WHERE game_id=?1",
+        (game_id.to_string(),),
+        |r| r.get(0),
+    )
+}
+
 #[cfg(test)]
 mod test {
     use crate::db::open_db_connection;
@@ -121,5 +129,16 @@ mod test {
 
         add_game_score(&mut conn, game_uuid, uid, 9001, 5).unwrap();
         assert_eq!(get_game_score(&mut conn, game_uuid, uid).unwrap(), 9001)
+    }
+
+    #[test]
+    fn max_score() {
+        let mut conn = setup_test_db();
+        let game_uuid = Uuid::new_v4();
+
+        add_game_score(&mut conn, game_uuid, UserID(2), 9001, 5).unwrap();
+        add_game_score(&mut conn, game_uuid, UserID(3), 60, 9).unwrap();
+        add_game_score(&mut conn, game_uuid, UserID(5), 11, 8).unwrap();
+        assert_eq!(get_top_game_score(&mut conn, game_uuid).unwrap(), 9001);
     }
 }
