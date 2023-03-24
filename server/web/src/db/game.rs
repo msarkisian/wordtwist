@@ -79,18 +79,22 @@ pub fn get_game_score(conn: &mut Connection, game_id: Uuid, user_id: UserID) -> 
     )
 }
 
-pub fn get_top_game_score(conn: &mut Connection, game_id: Uuid) -> Result<usize> {
+pub fn get_top_game_score(conn: &mut Connection, game_id: Uuid, max_time: usize) -> Result<usize> {
     conn.query_row(
-        "SELECT MAX(score) FROM scores WHERE game_id=?1",
-        (game_id.to_string(),),
+        "SELECT MAX(score) FROM scores WHERE game_id=?1 AND time<=?2",
+        (game_id.to_string(), max_time),
         |r| r.get(0),
     )
 }
 
-pub fn get_average_game_score(conn: &mut Connection, game_id: Uuid) -> Result<f64> {
+pub fn get_average_game_score(
+    conn: &mut Connection,
+    game_id: Uuid,
+    max_time: usize,
+) -> Result<f64> {
     conn.query_row(
-        "SELECT AVG(score) FROM scores WHERE game_id=?1",
-        (game_id.to_string(),),
+        "SELECT AVG(score) FROM scores WHERE game_id=?1 AND time=?2",
+        (game_id.to_string(), max_time),
         |r| r.get(0),
     )
 }
@@ -144,10 +148,10 @@ mod test {
         let mut conn = setup_test_db();
         let game_uuid = Uuid::new_v4();
 
-        add_game_score(&mut conn, game_uuid, UserID(2), 9001, 5).unwrap();
-        add_game_score(&mut conn, game_uuid, UserID(3), 60, 9).unwrap();
-        add_game_score(&mut conn, game_uuid, UserID(5), 11, 8).unwrap();
-        assert_eq!(get_top_game_score(&mut conn, game_uuid).unwrap(), 9001);
+        add_game_score(&mut conn, game_uuid, UserID(2), 9001, 30).unwrap();
+        add_game_score(&mut conn, game_uuid, UserID(3), 60, 60).unwrap();
+        add_game_score(&mut conn, game_uuid, UserID(5), 9002, 90).unwrap();
+        assert_eq!(get_top_game_score(&mut conn, game_uuid, 60).unwrap(), 9001);
     }
 
     #[test]
@@ -155,9 +159,13 @@ mod test {
         let mut conn = setup_test_db();
         let game_uuid = Uuid::new_v4();
 
-        add_game_score(&mut conn, game_uuid, UserID(2), 60, 5).unwrap();
-        add_game_score(&mut conn, game_uuid, UserID(3), 30, 9).unwrap();
-        add_game_score(&mut conn, game_uuid, UserID(5), 90, 8).unwrap();
-        assert_eq!(get_average_game_score(&mut conn, game_uuid).unwrap(), 60.0);
+        add_game_score(&mut conn, game_uuid, UserID(2), 60, 30).unwrap();
+        add_game_score(&mut conn, game_uuid, UserID(3), 30, 30).unwrap();
+        add_game_score(&mut conn, game_uuid, UserID(5), 90, 30).unwrap();
+        add_game_score(&mut conn, game_uuid, UserID(5), 10000, 60).unwrap();
+        assert_eq!(
+            get_average_game_score(&mut conn, game_uuid, 30).unwrap(),
+            60.0
+        );
     }
 }
