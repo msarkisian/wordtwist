@@ -1,6 +1,6 @@
 use crate::{
     db::{
-        game::{add_game_score, get_game_by_id, get_game_score},
+        game::{add_game_score, get_game_by_id, get_game_score, get_top_game_score},
         open_db_connection,
     },
     game::{DailyGame, Game},
@@ -17,6 +17,12 @@ use super::user::get_uid_from_cookie;
 struct PostScoreDTO {
     score: usize,
     time: usize,
+}
+
+#[derive(Deserialize)]
+struct GetMaxScoreDTO {
+    game_id: String,
+    max_time: usize,
 }
 
 pub async fn get_new_game(Path(size): Path<usize>) -> impl IntoResponse {
@@ -115,4 +121,30 @@ pub async fn post_score(
         }
     };
     Ok(StatusCode::CREATED)
+}
+
+pub async fn get_max_score(Json(payload): Json<serde_json::Value>) -> impl IntoResponse {
+    let Ok(payload) = serde_json::from_value::<GetMaxScoreDTO>(payload) else {
+        return Err((StatusCode::BAD_REQUEST, "Invalid body for getMaxScore"))
+    };
+    let Ok(game_id) = Uuid::parse_str(&payload.game_id) else {
+        return Err((StatusCode::BAD_REQUEST, "Invalid game id provided"))
+    };
+    let mut conn = open_db_connection();
+    let res = match get_top_game_score(&mut conn, game_id, payload.max_time) {
+        Ok(res) => res,
+        Err(rusqlite::Error::QueryReturnedNoRows) => {
+            return Err((
+                StatusCode::NOT_FOUND,
+                "No results found for provided game under provided time",
+            ))
+        }
+        Err(_) => {
+            return Err((
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Error getting max score from database",
+            ))
+        }
+    };
+    Ok((StatusCode::OK, res.to_string()))
 }
