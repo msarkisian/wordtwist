@@ -51,8 +51,9 @@ pub fn get_random_n_length_word(n: usize) -> String {
 /// (where the 0th index is 'a')
 fn count_chars(word: &str) -> [usize; 26] {
     let mut counts = [0; 26];
-    word.chars()
-        .for_each(|c| counts[(c as u8 - b'a') as usize] += 1);
+    for char in word.chars() {
+        counts[(char as u8 - b'a') as usize] += 1;
+    }
     counts
 }
 
@@ -63,11 +64,17 @@ fn count_chars(word: &str) -> [usize; 26] {
 /// This is to trim down the possible words to search for in grid permutations to a managable amount.
 ///
 /// Future optimization here (e.g. with character number count) could increase performance further.
-fn filter_words_by_character(characters: &[char]) -> Vec<String> {
+fn filter_words_by_character(characters: &str) -> Vec<String> {
+    let char_count = count_chars(characters);
     WORDS
         .iter()
         .filter_map(|w| {
-            if w.chars().all(|c| characters.contains(&c)) {
+            let word_count = count_chars(w);
+            if word_count
+                .iter()
+                .enumerate()
+                .all(|(idx, count)| char_count[idx] >= *count)
+            {
                 return Some(w.to_string());
             }
             None
@@ -164,9 +171,7 @@ pub fn generate_wordlist_from_game(grid: &Vec<Vec<char>>) -> Vec<String> {
         false
     }
 
-    let mut letters: Vec<char> = grid.iter().flatten().copied().collect();
-    letters.sort();
-    letters.dedup();
+    let letters: String = grid.iter().flatten().copied().collect();
 
     let possible_words = filter_words_by_character(&letters);
     let mut wordlist: Vec<String> = Vec::new();
@@ -225,5 +230,13 @@ mod tests {
         assert_eq!(output[1], 1); // b
         assert_eq!(output[14], 2); // o
         assert_eq!(output[0], 0);
+    }
+
+    #[test]
+    fn test_filter_words_by_character() {
+        let words = filter_words_by_character("bos");
+        println!("{:?}", words);
+        assert!(words.contains(&"sob".to_string()));
+        assert!(!words.contains(&"boss".to_string()));
     }
 }
