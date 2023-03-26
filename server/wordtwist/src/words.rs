@@ -49,10 +49,11 @@ pub fn get_random_n_length_word(n: usize) -> String {
 
 /// Counts the number of each character of `word`, returning an array of counts
 /// (where the 0th index is 'a')
-fn count_chars(word: &str) -> [usize; 26] {
+fn count_chars(word: &[char]) -> [usize; 26] {
     let mut counts = [0; 26];
-    word.chars()
-        .for_each(|c| counts[(c as u8 - b'a') as usize] += 1);
+    for char in word {
+        counts[(*char as u8 - b'a') as usize] += 1;
+    }
     counts
 }
 
@@ -220,8 +221,8 @@ mod tests {
 
     #[test]
     fn test_count_chars() {
-        let input = "boot";
-        let output = count_chars(input);
+        let input = ['b', 'o', 'o', 't'];
+        let output = count_chars(&input);
         assert_eq!(output[1], 1); // b
         assert_eq!(output[14], 2); // o
         assert_eq!(output[0], 0);
