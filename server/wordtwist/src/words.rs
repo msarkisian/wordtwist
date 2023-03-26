@@ -58,12 +58,9 @@ fn count_chars(word: &str) -> [usize; 26] {
 }
 
 /// Given `words` and `characters`, returns a new vector of only words solely comprised of
-/// j
-/// those characters.
+/// those characters in the provided count.
 ///
 /// This is to trim down the possible words to search for in grid permutations to a managable amount.
-///
-/// Future optimization here (e.g. with character number count) could increase performance further.
 fn filter_words_by_character(characters: &str) -> Vec<String> {
     let char_count = count_chars(characters);
     WORDS
