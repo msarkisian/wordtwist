@@ -1,6 +1,9 @@
 use crate::{
     db::{
-        game::{add_game_score, get_game_by_id, get_game_score, get_top_game_score},
+        game::{
+            add_game_score, get_average_game_score, get_game_by_id, get_game_score,
+            get_top_game_score,
+        },
         open_db_connection,
     },
     game::{DailyGame, Game},
@@ -23,6 +26,12 @@ struct PostScoreDTO {
 struct GetMaxScoreDTO {
     game_id: String,
     max_time: usize,
+}
+
+#[derive(Deserialize)]
+struct GetAverageScoreDTO {
+    game_id: String,
+    time: usize,
 }
 
 pub async fn get_new_game(Path(size): Path<usize>) -> impl IntoResponse {
@@ -66,7 +75,7 @@ pub async fn get_score(jar: SignedCookieJar, Path(game_id): Path<String>) -> imp
         return Err((StatusCode::UNAUTHORIZED, "You are not currently logged in"));
     };
     let Ok(game_id) = Uuid::parse_str(&game_id) else {
-        return Err((StatusCode::BAD_REQUEST, "Invalid game id provided"))
+        return Err((StatusCode::BAD_REQUEST, "Invalid game id provided"));
     };
     let conn = &mut open_db_connection();
     let score = match get_game_score(conn, game_id, uid) {
@@ -93,10 +102,10 @@ pub async fn post_score(
     Json(payload): Json<serde_json::Value>,
 ) -> impl IntoResponse {
     let Ok(game_id) = Uuid::parse_str(&game_id) else {
-        return Err((StatusCode::BAD_REQUEST, "Invalid game id provided"))
+        return Err((StatusCode::BAD_REQUEST, "Invalid game id provided"));
     };
     let Ok(payload) = serde_json::from_value::<PostScoreDTO>(payload) else {
-        return Err((StatusCode::BAD_REQUEST, "Invalid body for PostScore"))
+        return Err((StatusCode::BAD_REQUEST, "Invalid body for PostScore"));
     };
     let Some(uid) = get_uid_from_cookie(jar) else {
         return Err((StatusCode::UNAUTHORIZED, "You are not currently logged in"));
@@ -125,13 +134,39 @@ pub async fn post_score(
 
 pub async fn get_max_score(Json(payload): Json<serde_json::Value>) -> impl IntoResponse {
     let Ok(payload) = serde_json::from_value::<GetMaxScoreDTO>(payload) else {
-        return Err((StatusCode::BAD_REQUEST, "Invalid body for getMaxScore"))
+        return Err((StatusCode::BAD_REQUEST, "Invalid body for getMaxScore"));
     };
     let Ok(game_id) = Uuid::parse_str(&payload.game_id) else {
-        return Err((StatusCode::BAD_REQUEST, "Invalid game id provided"))
+        return Err((StatusCode::BAD_REQUEST, "Invalid game id provided"));
     };
     let mut conn = open_db_connection();
     let res = match get_top_game_score(&mut conn, game_id, payload.max_time) {
+        Ok(res) => res,
+        Err(rusqlite::Error::QueryReturnedNoRows) => {
+            return Err((
+                StatusCode::NOT_FOUND,
+                "No results found for provided game under provided time",
+            ))
+        }
+        Err(_) => {
+            return Err((
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Error getting max score from database",
+            ))
+        }
+    };
+    Ok((StatusCode::OK, res.to_string()))
+}
+
+pub async fn get_avg_score(Json(payload): Json<serde_json::Value>) -> impl IntoResponse {
+    let Ok(payload) = serde_json::from_value::<GetAverageScoreDTO>(payload) else {
+        return Err((StatusCode::BAD_REQUEST, "Invalid body for getAverageScore"));
+    };
+    let Ok(game_id) = Uuid::parse_str(&payload.game_id) else {
+        return Err((StatusCode::BAD_REQUEST, "Invalid game id provided"));
+    };
+    let mut conn = open_db_connection();
+    let res = match get_average_game_score(&mut conn, game_id, payload.time) {
         Ok(res) => res,
         Err(rusqlite::Error::QueryReturnedNoRows) => {
             return Err((
