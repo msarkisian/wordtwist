@@ -11,8 +11,7 @@ use axum_extra::{extract::cookie::Key, routing::SpaRouter};
 use db::open_db_connection;
 use routes::{
     game::{
-        get_avg_score, get_daily_game, get_existing_game_by_id, get_max_score, get_new_game,
-        get_score, post_score,
+        get_daily_game, get_existing_game_by_id, get_new_game, get_score, get_stats, post_score,
     },
     user::{create_new_user, get_login, login_user, logout_user},
 };
@@ -44,8 +43,7 @@ async fn main() {
         .route("/game/id/:id", get(get_existing_game_by_id))
         .route("/game/daily", get(get_daily_game))
         .route("/game/score/:id", get(get_score).post(post_score))
-        .route("/game/score/max", get(get_max_score))
-        .route("/game/score/average", get(get_avg_score))
+        .route("/game/stats", get(get_stats))
         .route("/user", post(create_new_user))
         .route(
             "/login",

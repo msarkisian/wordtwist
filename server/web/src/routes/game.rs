@@ -1,9 +1,6 @@
 use crate::{
     db::{
-        game::{
-            add_game_score, get_average_game_score, get_game_by_id, get_game_score,
-            get_top_game_score,
-        },
+        game::{add_game_score, get_game_by_id, get_game_score, get_game_stats},
         open_db_connection,
     },
     game::{DailyGame, Game},
@@ -23,15 +20,9 @@ struct PostScoreDTO {
 }
 
 #[derive(Deserialize)]
-struct GetMaxScoreDTO {
+struct GetGameStatsDTO {
     game_id: String,
     max_time: usize,
-}
-
-#[derive(Deserialize)]
-struct GetAverageScoreDTO {
-    game_id: String,
-    time: usize,
 }
 
 pub async fn get_new_game(Path(size): Path<usize>) -> impl IntoResponse {
@@ -132,41 +123,15 @@ pub async fn post_score(
     Ok(StatusCode::CREATED)
 }
 
-pub async fn get_max_score(Json(payload): Json<serde_json::Value>) -> impl IntoResponse {
-    let Ok(payload) = serde_json::from_value::<GetMaxScoreDTO>(payload) else {
-        return Err((StatusCode::BAD_REQUEST, "Invalid body for getMaxScore"));
-    };
-    let Ok(game_id) = Uuid::parse_str(&payload.game_id) else {
-        return Err((StatusCode::BAD_REQUEST, "Invalid game id provided"));
-    };
-    let mut conn = open_db_connection();
-    let res = match get_top_game_score(&mut conn, game_id, payload.max_time) {
-        Ok(res) => res,
-        Err(rusqlite::Error::QueryReturnedNoRows) => {
-            return Err((
-                StatusCode::NOT_FOUND,
-                "No results found for provided game under provided time",
-            ))
-        }
-        Err(_) => {
-            return Err((
-                StatusCode::INTERNAL_SERVER_ERROR,
-                "Error getting max score from database",
-            ))
-        }
-    };
-    Ok((StatusCode::OK, res.to_string()))
-}
-
-pub async fn get_avg_score(Json(payload): Json<serde_json::Value>) -> impl IntoResponse {
-    let Ok(payload) = serde_json::from_value::<GetAverageScoreDTO>(payload) else {
+pub async fn get_stats(Json(payload): Json<serde_json::Value>) -> impl IntoResponse {
+    let Ok(payload) = serde_json::from_value::<GetGameStatsDTO>(payload) else {
         return Err((StatusCode::BAD_REQUEST, "Invalid body for getAverageScore"));
     };
     let Ok(game_id) = Uuid::parse_str(&payload.game_id) else {
         return Err((StatusCode::BAD_REQUEST, "Invalid game id provided"));
     };
     let mut conn = open_db_connection();
-    let res = match get_average_game_score(&mut conn, game_id, payload.time) {
+    let res = match get_game_stats(&mut conn, game_id, payload.max_time) {
         Ok(res) => res,
         Err(rusqlite::Error::QueryReturnedNoRows) => {
             return Err((
@@ -174,12 +139,13 @@ pub async fn get_avg_score(Json(payload): Json<serde_json::Value>) -> impl IntoR
                 "No results found for provided game under provided time",
             ))
         }
-        Err(_) => {
+        Err(e) => {
+            eprintln!("{:?}", e);
             return Err((
                 StatusCode::INTERNAL_SERVER_ERROR,
-                "Error getting max score from database",
-            ))
+                "Error getting game stats from database",
+            ));
         }
     };
-    Ok((StatusCode::OK, res.to_string()))
+    Ok((StatusCode::OK, Json(res)))
 }
