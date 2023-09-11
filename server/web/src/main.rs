@@ -17,7 +17,7 @@ use routes::{
     user::{create_new_user, get_login, login_user, logout_user},
 };
 
-const KEY_STR: &[u8] = include_bytes!("../cookie_key");
+const KEY_BYTES: &[u8] = include_bytes!("../cookie_key");
 
 #[derive(Clone)]
 struct AppState {
@@ -35,7 +35,7 @@ async fn main() {
     let _ = open_db_connection();
 
     let state = AppState {
-        key: Key::from(KEY_STR),
+        key: Key::from(KEY_BYTES),
     };
 
     let app = Router::new()
