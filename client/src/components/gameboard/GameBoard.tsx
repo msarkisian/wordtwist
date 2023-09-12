@@ -88,13 +88,13 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
 
   const startGame = async (
     daily: boolean,
-    id: string | null,
+    id: string,
     size: number,
     time: number
   ) => {
     let url: string;
     if (daily) url = 'game/daily';
-    else if (id) url = `/game/id/${id}`;
+    else if (id !== '') url = `/game/id/${id}`;
     else url = `/game/${size}`;
     const res = await fetch(url);
     if (res.status !== 200) {
