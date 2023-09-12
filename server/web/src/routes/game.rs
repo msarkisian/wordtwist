@@ -103,7 +103,7 @@ pub async fn post_score(
     };
 
     let conn = &mut open_db_connection();
-    let _ = match add_game_score(conn, game_id, uid, payload.score, payload.time) {
+    match add_game_score(conn, game_id, uid, payload.score, payload.time) {
         Ok(_) => (),
         Err(rusqlite::Error::SqliteFailure(e, _))
             if e.code == rusqlite::ErrorCode::ConstraintViolation =>
