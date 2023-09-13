@@ -37,7 +37,6 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
               className="w-16"
               type="number"
               name="size"
-              disabled={advancedSettings}
               value={size}
               min="3"
               max="7"
