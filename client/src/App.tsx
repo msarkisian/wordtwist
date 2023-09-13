@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { createContext, useState } from 'react';
 import { GameBoard } from './components/gameboard/GameBoard';
 import { Header } from './components/Header';
 import { LoginRegister } from './components/login/LoginRegister';
 import { useLocalStorageState } from './hooks/useLocalStorageState';
 import { useTimeoutState } from './hooks/useTimeoutState';
+import UserContext from './UserContext';
 
 function App() {
   const [username, setUsername] = useLocalStorageState<string | null>(
@@ -47,12 +48,18 @@ function App() {
 
   return (
     <>
-      <Header username={username} setShowLogin={setShowLogin} logout={logout} />
-      {showLogin ? (
-        <LoginRegister login={login} loginError={loginError} />
-      ) : (
-        <GameBoard />
-      )}
+      <UserContext.Provider value={username}>
+        <Header
+          username={username}
+          setShowLogin={setShowLogin}
+          logout={logout}
+        />
+        {showLogin ? (
+          <LoginRegister login={login} loginError={loginError} />
+        ) : (
+          <GameBoard />
+        )}
+      </UserContext.Provider>
     </>
   );
 }

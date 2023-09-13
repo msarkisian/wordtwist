@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
+import UserContext from '../../UserContext';
 
 interface GameResultsProps {
   gameId: string;
@@ -18,6 +19,7 @@ export const GameResults: React.FC<GameResultsProps> = ({
   lastTime,
 }) => {
   const [copiedId, setCopiedId] = useState(false);
+  const username = useContext(UserContext);
   useEffect(() => {
     fetch(`/game/score/${gameId}`, {
       method: 'POST',
