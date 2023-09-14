@@ -1,9 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Letter } from './Letter';
 import { GameData, GameGrid } from '../../@types';
 import { GameOptions } from './GameOptions';
 import { useLocalStorageState } from '../../hooks/useLocalStorageState';
 import { GameResults } from './GameResults';
+import UserContext from '../../UserContext';
 
 interface GameBoardProps {}
 
@@ -30,6 +31,8 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
   const [validWords, setValidWords] = useState<string[]>([]);
   const [preGame, setPreGame] = useState(true);
   const [postGame, setPostGame] = useState(false);
+
+  const username = useContext(UserContext);
 
   const handleMouseDown = (y: number, x: number) => {
     if (!grid) return;
@@ -141,11 +144,30 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
     setPostGame(false);
   };
 
+  const postGameScore = async () => {
+    const url = `/game/score/${gameId}`;
+
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({
+        score,
+        time: lastTime,
+      }),
+    });
+    if (res.status !== 201) {
+      throw new Error('Error posting score to server');
+    }
+  };
+
   useEffect(() => {
     if (remainingTime === 0) {
       clearInterval(timerIntervalRef.current);
       setValidWords([...validWords].sort((a, b) => b.length - a.length));
       setPostGame(true);
+      if (username !== null) postGameScore();
     }
   }, [remainingTime]);
 
@@ -169,7 +191,6 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
         score={score}
         validWords={validWords}
         reset={reset}
-        lastTime={lastTime}
       />
     );
   }
