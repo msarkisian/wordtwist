@@ -12,9 +12,11 @@ function App() {
     null
   );
   const [showLogin, setShowLogin] = useState(false);
+  const [showRegister, setShowRegister] = useState(false);
   const [loginError, setLoginError] = useTimeoutState<string>(10000);
 
   const loginUrl = '/login';
+  const registerUrl = '/user';
 
   const login = async (username: string, password: string) => {
     const body = { username, password };
@@ -35,6 +37,25 @@ function App() {
     setShowLogin(false);
   };
 
+  const register = async (username: string, password: string) => {
+    const body = { username, password };
+
+    const res = await fetch(registerUrl, {
+      method: 'POST',
+      headers: {
+        'Content-type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) {
+      let body = await res.text();
+      setLoginError(body);
+      return;
+    }
+    setUsername(username);
+    setShowRegister(false);
+  };
+
   const logout = async () => {
     const res = await fetch(loginUrl, {
       method: 'DELETE',
@@ -52,10 +73,16 @@ function App() {
         <Header
           username={username}
           setShowLogin={setShowLogin}
+          setShowRegister={setShowRegister}
           logout={logout}
         />
         {showLogin ? (
-          <LoginRegister login={login} loginError={loginError} />
+          <LoginRegister
+            login={login}
+            loginError={loginError}
+            register={register}
+            showRegister={showRegister}
+          />
         ) : (
           <GameBoard />
         )}
