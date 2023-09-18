@@ -2,7 +2,7 @@ import React from 'react';
 
 interface LoginProps {
   login: (username: string, password: string) => void;
-  register: (username: string, password: string) => void;
+  register: (email: string, username: string, password: string) => void;
   loginError: string | null;
   showRegister: boolean;
 }
@@ -20,12 +20,23 @@ export const Login: React.FC<LoginProps> = ({
         e.preventDefault();
         const target = e.target as HTMLFormElement;
         if (!showRegister) login(target.username.value, target.password.value);
-        else register(target.username.value, target.password.value);
+        else
+          register(
+            target.email.value,
+            target.username.value,
+            target.password.value
+          );
       }}
     >
       <h2 className="text-xl text-center font-bold">
         {showRegister ? <>Create new account:</> : <>Log in:</>}
       </h2>
+      {showRegister && (
+        <label className="my-2 flex justify-evenly">
+          <span className="block">Email address:</span>
+          <input name="email" />
+        </label>
+      )}
       <label className="my-2 flex justify-evenly">
         <span className="block">Username:</span>
         <input name="username" />

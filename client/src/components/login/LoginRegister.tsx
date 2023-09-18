@@ -5,7 +5,7 @@ interface LoginProps {
   showRegister: boolean;
   login: (username: string, password: string) => void;
   loginError: string | null;
-  register: (username: string, password: string) => void;
+  register: (email: string, username: string, password: string) => void;
 }
 
 export const LoginRegister: React.FC<LoginProps> = ({

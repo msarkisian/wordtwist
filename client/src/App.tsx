@@ -37,8 +37,12 @@ function App() {
     setShowLogin(false);
   };
 
-  const register = async (username: string, password: string) => {
-    const body = { username, password };
+  const register = async (
+    email: string,
+    username: string,
+    password: string
+  ) => {
+    const body = { email, username, password };
 
     const res = await fetch(registerUrl, {
       method: 'POST',
