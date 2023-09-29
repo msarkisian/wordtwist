@@ -1,4 +1,4 @@
-import { createContext, useState } from 'react';
+import { useState } from 'react';
 import { GameBoard } from './components/gameboard/GameBoard';
 import { Header } from './components/Header';
 import { LoginRegister } from './components/login/LoginRegister';
@@ -58,6 +58,7 @@ function App() {
     }
     setUsername(username);
     setShowRegister(false);
+    setShowLogin(false);
   };
 
   const logout = async () => {
