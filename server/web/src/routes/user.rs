@@ -25,7 +25,10 @@ struct LoginDTO {
     password: String,
 }
 
-pub async fn create_new_user(Json(payload): Json<serde_json::Value>) -> impl IntoResponse {
+pub async fn create_new_user(
+    jar: SignedCookieJar,
+    Json(payload): Json<serde_json::Value>,
+) -> impl IntoResponse {
     let data: AddUserDTO = match serde_json::from_value(payload) {
         Ok(data) => data,
         Err(_) => {
@@ -48,7 +51,7 @@ pub async fn create_new_user(Json(payload): Json<serde_json::Value>) -> impl Int
         }
     };
 
-    Ok((StatusCode::CREATED, id.0.to_string()))
+    Ok((StatusCode::CREATED, jar.add(build_cookie(id))))
 }
 
 pub async fn login_user(
@@ -69,16 +72,12 @@ pub async fn login_user(
         Ok(uid) => uid,
         Err(_) => return Err((StatusCode::UNAUTHORIZED, "Invalid username or password")),
     };
-    let cookie = Cookie::build(SESSION_COOKIE_KEY, uid.0.to_string())
-        .http_only(true)
-        .same_site(SameSite::Strict)
-        .finish();
-    Ok((StatusCode::OK, jar.add(cookie)))
+    Ok((StatusCode::OK, jar.add(build_cookie(uid))))
 }
 
 pub async fn get_login(jar: SignedCookieJar) -> impl IntoResponse {
     let Some(_) = get_uid_from_cookie(jar) else {
-         return Err((StatusCode::UNAUTHORIZED, "You are not currently logged in"));
+        return Err((StatusCode::UNAUTHORIZED, "You are not currently logged in"));
     };
     Ok(StatusCode::NO_CONTENT)
 }
@@ -94,4 +93,11 @@ pub async fn logout_user(jar: SignedCookieJar) -> impl IntoResponse {
 pub fn get_uid_from_cookie(jar: SignedCookieJar) -> Option<UserID> {
     let cookie = jar.get(SESSION_COOKIE_KEY)?;
     Some(UserID(cookie.value().parse().ok()?))
+}
+
+fn build_cookie<'a>(uid: UserID) -> Cookie<'a> {
+    Cookie::build(SESSION_COOKIE_KEY, uid.0.to_string())
+        .http_only(true)
+        .same_site(SameSite::Strict)
+        .finish()
 }
