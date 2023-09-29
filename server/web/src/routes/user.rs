@@ -41,14 +41,27 @@ pub async fn create_new_user(
     let conn = &mut open_db_connection();
     let id = match add_user(conn, &data.username, &data.email, &data.password) {
         Ok(id) => id,
-        // TODO: downcast anyhow error, check for rustqlite constraint violation,
-        // and print seperate error message on that
-        Err(_) => {
-            return Err((
-                StatusCode::INTERNAL_SERVER_ERROR,
-                "Error adding new user to database",
-            ))
-        }
+        Err(e) => match e.downcast() {
+            Ok(rusqlite::Error::SqliteFailure(e, _)) => {
+                if e.code == rusqlite::ErrorCode::ConstraintViolation {
+                    return Err((
+                        StatusCode::CONFLICT,
+                        "A user with this username or email already exists",
+                    ));
+                } else {
+                    return Err((
+                        StatusCode::INTERNAL_SERVER_ERROR,
+                        "Error adding new user to database",
+                    ));
+                }
+            }
+            _ => {
+                return Err((
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    "Error adding new user to database",
+                ))
+            }
+        },
     };
 
     Ok((StatusCode::CREATED, jar.add(build_cookie(id))))

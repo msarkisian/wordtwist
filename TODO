@@ -3,4 +3,3 @@
  - Refactor logic flow for login/register
 
 ## Backend
- - Send better error messages for register failure
