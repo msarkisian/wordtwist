@@ -120,6 +120,7 @@ export const GameOptions: React.FC<GameOptionsProps> = ({
               className="btn-secondary w-48 h-8 my-2"
               onClick={(e) => {
                 e.preventDefault();
+                setGameId('');
                 setAdvancedSettings(!advancedSettings);
               }}
             >
