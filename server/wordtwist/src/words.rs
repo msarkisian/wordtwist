@@ -1,23 +1,25 @@
+use std::sync::OnceLock;
+
 use rand::{
     seq::{IteratorRandom, SliceRandom},
     thread_rng,
 };
 
-lazy_static! {
-    static ref WORDS: Vec<String> = read_words();
-}
+static WORDS: OnceLock<Vec<String>> = OnceLock::new();
 
-/// Parses the compiled wordlist (from `words.txt`) into a vector of individual words.
-fn read_words() -> Vec<String> {
-    let text = include_str!("../words.txt");
-    text.lines().map(|w| w.to_lowercase()).collect()
+/// Initializes the `WORDS` vector on first call, returns the reference on subsequent calls
+fn get_words() -> &'static [String] {
+    WORDS.get_or_init(|| {
+        let text = include_str!("../words.txt");
+        text.lines().map(|w| w.to_lowercase()).collect()
+    })
 }
 
 /// Provided a size `n`, returns a vector of all words of that size, using the module's `lazy_static!` `WORDS`.
 fn get_all_n_length_words(n: usize) -> Vec<String> {
     let mut output = Vec::new();
 
-    for word in WORDS.iter() {
+    for word in get_words().iter() {
         if word.chars().count() == n {
             output.push(word.to_string())
         }
@@ -63,7 +65,7 @@ fn count_chars(word: &str) -> [usize; 26] {
 /// This is to trim down the possible words to search for in grid permutations to a managable amount.
 fn filter_words_by_character(characters: &str) -> Vec<String> {
     let char_count = count_chars(characters);
-    WORDS
+    get_words()
         .iter()
         .filter_map(|w| {
             let word_count = count_chars(w);
