@@ -15,7 +15,7 @@ fn get_words() -> &'static [String] {
     })
 }
 
-/// Provided a size `n`, returns a vector of all words of that size, using the module's `lazy_static!` `WORDS`.
+/// Provided a size `n`, returns a vector of all words of that size, using the module's lazily loaded wordlist.
 fn get_all_n_length_words(n: usize) -> Vec<String> {
     let mut output = Vec::new();
 
@@ -42,7 +42,7 @@ pub fn get_random_letter() -> char {
         .unwrap()
 }
 
-/// Generates a random word of length `n` from the module's `lazy_static!` `WORDS`.
+/// Generates a random word of length `n` from the module's lazily loaded wordlist.
 pub fn get_random_n_length_word(n: usize) -> String {
     get_random_word(&get_all_n_length_words(n))
         .expect("Requested word of nonexistant size!")
@@ -51,6 +51,8 @@ pub fn get_random_n_length_word(n: usize) -> String {
 
 /// Counts the number of each character of `word`, returning an array of counts
 /// (where the 0th index is 'a')
+///
+/// Panics if `word` doesn't consist of lowercase regular Latin letters.
 fn count_chars(word: &str) -> [usize; 26] {
     let mut counts = [0; 26];
     for char in word.chars() {
@@ -68,7 +70,7 @@ fn filter_words_by_character(characters: &str) -> Vec<String> {
     get_words()
         .iter()
         .filter_map(|w| {
-            let word_count = count_chars(w);
+            let word_count = unsafe { count_chars(w) };
             if word_count
                 .iter()
                 .enumerate()
@@ -82,7 +84,7 @@ fn filter_words_by_character(characters: &str) -> Vec<String> {
 }
 
 /// Given a game `&grid`, returns a vector of all the words that can be found inside that grid.
-pub fn generate_wordlist_from_game(grid: &Vec<Vec<char>>) -> Vec<String> {
+fn generate_wordlist_from_game(grid: &Vec<Vec<char>>) -> Vec<String> {
     /// Recursive helper function to search for the remaining `word` slice in the `grid`.
     fn search_for_word(
         grid: &Vec<Vec<char>>,
