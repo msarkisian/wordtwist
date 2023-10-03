@@ -70,7 +70,7 @@ fn filter_words_by_character(characters: &str) -> Vec<String> {
     get_words()
         .iter()
         .filter_map(|w| {
-            let word_count = unsafe { count_chars(w) };
+            let word_count = count_chars(w);
             if word_count
                 .iter()
                 .enumerate()
@@ -84,7 +84,9 @@ fn filter_words_by_character(characters: &str) -> Vec<String> {
 }
 
 /// Given a game `&grid`, returns a vector of all the words that can be found inside that grid.
-fn generate_wordlist_from_game(grid: &Vec<Vec<char>>) -> Vec<String> {
+///
+/// Panics if `grid` contains non ASCII lowercase characters
+pub fn generate_wordlist_from_game(grid: &Vec<Vec<char>>) -> Vec<String> {
     /// Recursive helper function to search for the remaining `word` slice in the `grid`.
     fn search_for_word(
         grid: &Vec<Vec<char>>,
@@ -239,5 +241,15 @@ mod tests {
         println!("{:?}", words);
         assert!(words.contains(&"sob".to_string()));
         assert!(!words.contains(&"boss".to_string()));
+    }
+
+    #[test]
+    /// Ensures the module's words do not contain non-ascii characters (would panic at runtime)
+    fn no_non_ascii_chars() {
+        assert!(get_words()
+            .iter()
+            .map(|w| w.chars())
+            .flatten()
+            .all(|c| c.is_ascii_lowercase()),);
     }
 }
