@@ -7,7 +7,7 @@ use axum::{
     routing::{get, post},
     Router,
 };
-use axum_extra::{extract::cookie::Key, routing::SpaRouter};
+use axum_extra::extract::cookie::Key;
 use db::open_db_connection;
 use routes::{
     game::{
@@ -15,6 +15,7 @@ use routes::{
     },
     user::{create_new_user, get_login, login_user, logout_user},
 };
+use tower_http::services::{ServeDir, ServeFile};
 
 const KEY_BYTES: &[u8] = include_bytes!("../cookie_key");
 
@@ -38,7 +39,8 @@ async fn main() {
     };
 
     let app = Router::new()
-        .merge(SpaRouter::new("/assets", "../client/dist/assets").index_file("../index.html"))
+        .nest_service("/", ServeFile::new("../client/dist/index.html"))
+        .nest_service("/assets", ServeDir::new("../client/dist/assets"))
         .route("/game/:size", get(get_new_game))
         .route("/game/id/:id", get(get_existing_game_by_id))
         .route("/game/daily", get(get_daily_game))

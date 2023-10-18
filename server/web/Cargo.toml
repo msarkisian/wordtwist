@@ -7,13 +7,14 @@ edition = "2021"
 
 [dependencies]
 axum = "0.6.1"
-axum-extra = { version = "0.4.2", features = ["spa", "cookie", "cookie-signed"] }
-tokio = {version = "1", features = ["full"]}
-wordtwist = { path = "../wordtwist"}
+axum-extra = { version = "0.8.0", features = ["cookie", "cookie-signed"] }
+tokio = { version = "1", features = ["full"] }
+wordtwist = { path = "../wordtwist" }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0.89"
-rusqlite = { version = "0.28.0", features = ["bundled"]}
-uuid = { version = "1.2.2", features = ["v4", "fast-rng"]}
+rusqlite = { version = "0.28.0", features = ["bundled"] }
+uuid = { version = "1.2.2", features = ["v4", "fast-rng"] }
 chrono = "0.4.23"
 argon2 = { version = "0.5.0", features = ["password-hash"] }
 anyhow = "1.0.69"
+tower-http = { version = "0.4.4", features = ["fs"] }
