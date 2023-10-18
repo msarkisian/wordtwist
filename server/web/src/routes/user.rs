@@ -1,6 +1,6 @@
 use axum::{http::StatusCode, response::IntoResponse, Json};
 use axum_extra::extract::{
-    cookie::{Cookie, Expiration, SameSite},
+    cookie::{Cookie, SameSite},
     SignedCookieJar,
 };
 use cookie::time::Duration;

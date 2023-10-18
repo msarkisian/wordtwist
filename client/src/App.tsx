@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { GameBoard } from './components/gameboard/GameBoard';
 import { Header } from './components/Header';
 import { LoginRegister } from './components/login/LoginRegister';
@@ -71,6 +71,15 @@ function App() {
     }
     throw new Error('server errored when sending logout request: ' + res);
   };
+
+  const checkIfLoggedIn = async () => {
+    const res = await fetch(loginUrl);
+    if (res.status !== 204) setUsername(null);
+  };
+
+  useEffect(() => {
+    checkIfLoggedIn();
+  }, []);
 
   return (
     <>
