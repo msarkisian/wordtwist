@@ -6,7 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-axum = "0.6.1"
+axum = { version = "0.6.1", features = ["ws"] }
 axum-extra = { version = "0.8.0", features = ["cookie", "cookie-signed"] }
 tokio = { version = "1", features = ["full"] }
 wordtwist = { path = "../wordtwist" }

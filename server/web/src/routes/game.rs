@@ -1,12 +1,20 @@
+use std::net::SocketAddr;
+
 use crate::{
     db::{
         game::{add_game_score, get_game_by_id, get_game_score, get_game_stats},
         open_db_connection,
     },
     game::{DailyGame, Game},
+    ws::handle_socket_game,
 };
 
-use axum::{extract::Path, http::StatusCode, response::IntoResponse, Json};
+use axum::{
+    extract::{ws, ConnectInfo, Path, WebSocketUpgrade},
+    http::StatusCode,
+    response::IntoResponse,
+    Json,
+};
 use axum_extra::extract::SignedCookieJar;
 use serde::Deserialize;
 use uuid::Uuid;
@@ -25,14 +33,20 @@ struct GetGameStatsDTO {
     max_time: usize,
 }
 
-pub async fn get_new_game(Path(size): Path<usize>) -> impl IntoResponse {
+pub async fn get_new_game(
+    Path(size): Path<usize>,
+    ws: WebSocketUpgrade,
+    ConnectInfo(addr): ConnectInfo<SocketAddr>,
+) -> impl IntoResponse {
     if !(3..=7).contains(&size) {
-        return Err((
+        return Err::<(), _>((
             StatusCode::BAD_REQUEST,
             "Invalid game size. Games can be of size 3-7 inclusive.",
-        ));
+        ))
+        .into_response();
     }
-    Ok((StatusCode::OK, Json(Game::new(size))))
+    ws.on_upgrade(move |socket| handle_socket_game(socket, addr, Game::new(size)))
+        .into_response()
 }
 
 pub async fn get_existing_game_by_id(Path(id): Path<String>) -> impl IntoResponse {

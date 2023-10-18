@@ -1,6 +1,9 @@
 mod db;
 mod game;
 mod routes;
+mod ws;
+
+use std::net::SocketAddr;
 
 use axum::{
     extract::FromRef,
@@ -54,7 +57,7 @@ async fn main() {
         .with_state(state);
 
     axum::Server::bind(&"127.0.0.1:8080".parse().unwrap())
-        .serve(app.into_make_service())
+        .serve(app.into_make_service_with_connect_info::<SocketAddr>())
         .await
-        .unwrap();
+        .unwrap()
 }
