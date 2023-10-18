@@ -1,8 +1,9 @@
 use axum::{http::StatusCode, response::IntoResponse, Json};
 use axum_extra::extract::{
-    cookie::{Cookie, SameSite},
+    cookie::{Cookie, Expiration, SameSite},
     SignedCookieJar,
 };
+use cookie::time::Duration;
 use serde::Deserialize;
 
 use crate::db::{
@@ -111,6 +112,7 @@ pub fn get_uid_from_cookie(jar: SignedCookieJar) -> Option<UserID> {
 fn build_cookie<'a>(uid: UserID) -> Cookie<'a> {
     Cookie::build(SESSION_COOKIE_KEY, uid.0.to_string())
         .http_only(true)
+        .max_age(Duration::days(7))
         .same_site(SameSite::Strict)
         .finish()
 }
