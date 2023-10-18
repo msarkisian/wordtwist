@@ -120,7 +120,8 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
         Array(jsonRes.data.grid.length).fill(false)
       )
     );
-    setRemainingTime(time);
+    if (daily) setRemainingTime(120);
+    else setRemainingTime(time);
     setLastTime(time);
     startTimer();
     setPreGame(false);
