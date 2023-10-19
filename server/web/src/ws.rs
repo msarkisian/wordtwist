@@ -1,9 +1,25 @@
 use std::{net::SocketAddr, time::Duration};
 
 use axum::extract::ws::{Message, WebSocket};
+use serde::Serialize;
+use serde_json;
 use tokio::sync::oneshot;
 
 use crate::game::Game;
+
+#[derive(Serialize)]
+#[serde(tag = "type")]
+enum SocketResponse<'a> {
+    GuessResponse { word: &'a str, valid: bool },
+    GameOver { results: GameResults },
+}
+
+#[derive(Serialize)]
+struct GameResults {
+    found_words: Vec<String>,
+    missed_words: Vec<String>,
+    // score: u6i644,
+}
 
 pub async fn handle_socket_game(mut socket: WebSocket, _: SocketAddr, game: Game) {
     // TODO let client pass us their gametime
@@ -29,7 +45,7 @@ pub async fn handle_socket_game(mut socket: WebSocket, _: SocketAddr, game: Game
             tokio::select! {
                 _ = &mut rx_done => {
                     println!("timeout");
-                    if socket.send(Message::Text("!GAME OVER".to_string())).await.is_err() {
+                    if socket.send(Message::Text(serde_json::to_string(&SocketResponse::GameOver { results: todo!() }).unwrap())).await.is_err() {
                         break;
                     }
                 },
@@ -39,10 +55,11 @@ pub async fn handle_socket_game(mut socket: WebSocket, _: SocketAddr, game: Game
                             if let Message::Text(word) = msg {
                                 if game.data.valid_words().contains(&word) && !submitted_words.contains(&word) {
                                     submitted_words.push(word);
-                                    if socket.send(Message::Text("true".to_string())).await.is_err() {
+                                    if socket.send(Message::Text(serde_json::to_string(&SocketResponse::GuessResponse {valid: true, word: submitted_words.last().unwrap()}).unwrap())).await.is_err() {
                                         break;
                                     }
-                                } else if socket.send(Message::Text("false".to_string())).await.is_err() {
+                                // } else if socket.send(Message::Text("false".to_string())).await.is_err() {
+                                } else if socket.send(Message::Text(serde_json::to_string(&SocketResponse::GuessResponse {valid: false, word: &word}).unwrap())).await.is_err() {
                                     break;
                                 }
                             }
