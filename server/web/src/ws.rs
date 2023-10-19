@@ -4,6 +4,7 @@ use axum::extract::ws::{Message, WebSocket};
 use serde::Serialize;
 use serde_json;
 use tokio::sync::oneshot;
+use wordtwist::game::GameResults;
 
 use crate::game::Game;
 
@@ -12,13 +13,6 @@ use crate::game::Game;
 enum SocketResponse<'a> {
     GuessResponse { word: &'a str, valid: bool },
     GameOver { results: GameResults },
-}
-
-#[derive(Serialize)]
-struct GameResults {
-    found_words: Vec<String>,
-    missed_words: Vec<String>,
-    // score: u6i644,
 }
 
 pub async fn handle_socket_game(mut socket: WebSocket, _: SocketAddr, game: Game) {
@@ -44,10 +38,8 @@ pub async fn handle_socket_game(mut socket: WebSocket, _: SocketAddr, game: Game
         loop {
             tokio::select! {
                 _ = &mut rx_done => {
-                    println!("timeout");
-                    if socket.send(Message::Text(serde_json::to_string(&SocketResponse::GameOver { results: todo!() }).unwrap())).await.is_err() {
-                        break;
-                    }
+                    let _ = socket.send(Message::Text(serde_json::to_string(&SocketResponse::GameOver { results: game.data.score(submitted_words) }).unwrap())).await.is_err();
+                    break;
                 },
                 s = socket.recv() => {
                     match s {
