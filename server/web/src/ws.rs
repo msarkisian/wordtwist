@@ -42,8 +42,7 @@ pub async fn handle_socket_game(mut socket: WebSocket, _: SocketAddr, game: Game
                         {
                             break;
                         }
-                    } else {
-                        if socket
+                    } else if socket
                             .send(Message::Text("false".to_string()))
                             .await
                             .is_err()
@@ -51,8 +50,6 @@ pub async fn handle_socket_game(mut socket: WebSocket, _: SocketAddr, game: Game
                             break;
                         }
                     }
-                }
-
                 }
             }
         }

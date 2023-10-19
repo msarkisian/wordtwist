@@ -10,7 +10,7 @@ use crate::{
 };
 
 use axum::{
-    extract::{ws, ConnectInfo, Path, WebSocketUpgrade},
+    extract::{ConnectInfo, Path, WebSocketUpgrade},
     http::StatusCode,
     response::IntoResponse,
     Json,
