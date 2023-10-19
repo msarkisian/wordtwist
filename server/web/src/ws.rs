@@ -24,29 +24,30 @@ pub async fn handle_socket_game(mut socket: WebSocket, _: SocketAddr, game: Game
 
     let mut process_words = tokio::spawn(async move {
         let mut submitted_words = Vec::with_capacity(game.data.valid_words().len());
+
         loop {
             tokio::select! {
                 _ = &mut rx_done => {
                     println!("timeout");
-                    let _ = socket.send(Message::Text("!GAME OVER".to_string())).await.is_err();
-                    break;
-                }
-                Some(Ok(msg)) = socket.recv() => {
-                if let Message::Text(word) = msg {
-                    if game.data.valid_words().contains(&word) && !submitted_words.contains(&word) {
-                        submitted_words.push(word);
-                        if socket
-                            .send(Message::Text("true".to_string()))
-                            .await
-                            .is_err()
-                        {
-                            break;
-                        }
-                    } else if socket
-                            .send(Message::Text("false".to_string()))
-                            .await
-                            .is_err()
-                        {
+                    if socket.send(Message::Text("!GAME OVER".to_string())).await.is_err() {
+                        break;
+                    }
+                },
+                s = socket.recv() => {
+                    match s {
+                        Some(Ok(msg)) => {
+                            if let Message::Text(word) = msg {
+                                if game.data.valid_words().contains(&word) && !submitted_words.contains(&word) {
+                                    submitted_words.push(word);
+                                    if socket.send(Message::Text("true".to_string())).await.is_err() {
+                                        break;
+                                    }
+                                } else if socket.send(Message::Text("false".to_string())).await.is_err() {
+                                    break;
+                                }
+                            }
+                        },
+                        _ => {
                             break;
                         }
                     }
