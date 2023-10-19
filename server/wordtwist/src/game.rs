@@ -17,6 +17,13 @@ enum GameDirections {
     DownRight,
 }
 
+#[derive(Serialize)]
+pub struct GameResults {
+    found_words: Vec<String>,
+    missed_words: Vec<String>,
+    score: usize,
+}
+
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct Game {
     grid: Vec<Vec<char>>,
@@ -125,6 +132,23 @@ impl Game {
 
     pub fn validate(&self, word: &str) -> bool {
         self.valid_words.binary_search(&word.to_string()).is_ok()
+    }
+
+    pub fn score(self, mut found_words: Vec<String>) -> GameResults {
+        found_words.sort_by(|a, b| a.len().cmp(&b.len()));
+        let missed_words = self
+            .valid_words
+            .into_iter()
+            .filter(|w| !found_words.contains(w))
+            .collect();
+        GameResults {
+            score: found_words
+                .iter()
+                .map(|w| 2_usize.pow(w.len() as u32))
+                .sum(),
+            found_words,
+            missed_words,
+        }
     }
 }
 
