@@ -4,7 +4,7 @@ interface GameResultsProps {
   gameId: string;
   score: number;
   foundWords: string[];
-  validWords: string[];
+  missedWords: string[];
   reset: () => void;
 }
 
@@ -12,7 +12,7 @@ export const GameResults: React.FC<GameResultsProps> = ({
   gameId,
   score,
   foundWords,
-  validWords,
+  missedWords,
   reset,
 }) => {
   const [copiedId, setCopiedId] = useState(false);
@@ -44,7 +44,7 @@ export const GameResults: React.FC<GameResultsProps> = ({
             {word}
           </li>
         ))}
-        {validWords.map((word) => (
+        {missedWords.map((word) => (
           <li className="text-red-800" key={word}>
             {word}
           </li>

@@ -28,9 +28,11 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
   const [selectedWord, setSelectedWord] = useState('');
   // this is to allow backtracking to remove letters from the selection
   const [letterPath, setLetterPath] = useState<[number, number][]>([]);
-  const [validWords, setValidWords] = useState<string[]>([]);
   const [preGame, setPreGame] = useState(true);
   const [postGame, setPostGame] = useState(false);
+  const [missedWords, setMissedWords] = useState<string[]>([]);
+
+  const socket = useRef<WebSocket | null>(null);
 
   const username = useContext(UserContext);
 
@@ -79,11 +81,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
   };
 
   const handleMouseUp = (n: number) => {
-    if (validWords.includes(selectedWord)) {
-      setFoundWords([...foundWords, selectedWord]);
-      setValidWords(validWords.filter((word) => word !== selectedWord));
-      setScore((s) => s + 2 ** selectedWord.length);
-    }
+    socket.current!.send(selectedWord);
     setSelectedWord('');
     setSelectedLetters(Array(n).fill(Array(n).fill(false)));
     setLetterPath([]);
@@ -114,7 +112,6 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
     const jsonRes: GameData = await res.json();
     setGameId(jsonRes.id);
     setGrid(jsonRes.data.grid);
-    setValidWords(jsonRes.data.valid_words);
     setSelectedLetters(
       Array(jsonRes.data.grid.length).fill(
         Array(jsonRes.data.grid.length).fill(false)
@@ -145,6 +142,14 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
     setPostGame(false);
   };
 
+  const handleSocket = (url: string) => {
+    if (socket.current !== null) throw new Error('already have a socket open');
+    socket.current = new WebSocket(url);
+    socket.current.onmessage = (event) => {
+      const msg = JSON.parse(event.data);
+    };
+  };
+
   const postGameScore = async () => {
     const url = `/game/score/${gameId}`;
 
@@ -162,15 +167,6 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
       throw new Error('Error posting score to server');
     }
   };
-
-  useEffect(() => {
-    if (remainingTime === 0) {
-      clearInterval(timerIntervalRef.current);
-      setValidWords([...validWords].sort((a, b) => b.length - a.length));
-      setPostGame(true);
-      if (username !== null) postGameScore();
-    }
-  }, [remainingTime]);
 
   if (preGame) {
     return (
@@ -190,7 +186,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
         gameId={gameId!}
         foundWords={foundWords}
         score={score}
-        validWords={validWords}
+        missedWords={missedWords}
         reset={reset}
       />
     );
