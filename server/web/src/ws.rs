@@ -27,7 +27,9 @@ pub async fn handle_socket_game(mut socket: WebSocket, _: SocketAddr, game: Game
         loop {
             tokio::select! {
                 _ = &mut rx_done => {
-                    // end game
+                    println!("timeout");
+                    let _ = socket.send(Message::Text("!GAME OVER".to_string())).await.is_err();
+                    break;
                 }
                 Some(Ok(msg)) = socket.recv() => {
                 if let Message::Text(word) = msg {
@@ -38,7 +40,7 @@ pub async fn handle_socket_game(mut socket: WebSocket, _: SocketAddr, game: Game
                             .await
                             .is_err()
                         {
-                            // tx_done.send(());
+                            break;
                         }
                     } else {
                         if socket
@@ -46,7 +48,7 @@ pub async fn handle_socket_game(mut socket: WebSocket, _: SocketAddr, game: Game
                             .await
                             .is_err()
                         {
-                            // tx_done.send(());
+                            break;
                         }
                     }
                 }
@@ -57,11 +59,11 @@ pub async fn handle_socket_game(mut socket: WebSocket, _: SocketAddr, game: Game
     });
 
     tokio::select! {
-        to = (&mut timeout) => {
+        _ = (&mut timeout) => {
             // stop the process word task, signal the client
-            // tx_done.send(()).unwrap();
+            tx_done.send(()).unwrap();
         }
-        pw = (&mut process_words) => {
+        _ = (&mut process_words) => {
         // if client hangs up, cancel timeout
         timeout.abort();
         }
