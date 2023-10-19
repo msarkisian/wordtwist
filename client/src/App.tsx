@@ -77,6 +77,11 @@ function App() {
     if (res.status !== 204) setUsername(null);
   };
 
+  const goHome = () => {
+    setShowRegister(false);
+    setShowLogin(false);
+  };
+
   useEffect(() => {
     checkIfLoggedIn();
   }, []);
@@ -89,6 +94,7 @@ function App() {
           setShowLogin={setShowLogin}
           setShowRegister={setShowRegister}
           logout={logout}
+          goHome={goHome}
         />
         {showLogin ? (
           <LoginRegister

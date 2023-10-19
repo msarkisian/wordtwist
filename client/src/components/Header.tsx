@@ -5,6 +5,7 @@ interface HeaderProps {
   setShowLogin: (show: boolean) => void;
   setShowRegister: (show: boolean) => void;
   logout: () => void;
+  goHome: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -12,10 +13,16 @@ export const Header: React.FC<HeaderProps> = ({
   setShowLogin,
   setShowRegister,
   logout,
+  goHome,
 }) => {
   return (
     <header className="h-12 flex bg-indigo-900 justify-between">
-      <h1 className="text-white font-extrabold mx-4 my-auto">Wordtwist</h1>
+      <h1
+        className="text-white font-extrabold mx-4 my-auto cursor-pointer hover:underline active:text-gray-300"
+        onClick={() => goHome()}
+      >
+        Wordtwist
+      </h1>
       {!username ? (
         <div className="flex">
           <button
