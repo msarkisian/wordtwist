@@ -1,27 +1,69 @@
-use std::net::SocketAddr;
+use std::{net::SocketAddr, time::Duration};
 
-use axum::{
-    extract::{
-        ws::{WebSocket, WebSocketUpgrade},
-        ConnectInfo,
-    },
-    response::IntoResponse,
-    Json,
-};
+use axum::extract::ws::{Message, WebSocket};
+use tokio::sync::oneshot;
 
 use crate::game::Game;
 
-pub async fn handle_socket_game(mut socket: WebSocket, who: SocketAddr, game: Game) {
+pub async fn handle_socket_game(mut socket: WebSocket, _: SocketAddr, game: Game) {
     // TODO let client pass us their gametime
-    const GAME_TIME: usize = 120;
-    if socket
+    const GAME_TIME: u64 = 120;
+    // ignoring potential errors here, since if the client fails to establish the socket
+    // there isn't anything we can do here anyway
+    let _ = socket
         .send(axum::extract::ws::Message::Text(
             serde_json::to_string(&game).unwrap(),
         ))
         .await
-        .is_ok()
-    {
-        println!("socket opened at {who:?}");
-        println!("{:?}", socket);
-    }
+        .is_ok();
+
+    let mut timeout = tokio::spawn(async {
+        tokio::time::sleep(Duration::from_secs(GAME_TIME)).await;
+    });
+    let (tx_done, mut rx_done) = oneshot::channel::<()>();
+
+    let mut process_words = tokio::spawn(async move {
+        let mut submitted_words = Vec::with_capacity(game.data.valid_words().len());
+        loop {
+            tokio::select! {
+                _ = &mut rx_done => {
+                    // end game
+                }
+                Some(Ok(msg)) = socket.recv() => {
+                if let Message::Text(word) = msg {
+                    if game.data.valid_words().contains(&word) && !submitted_words.contains(&word) {
+                        submitted_words.push(word);
+                        if socket
+                            .send(Message::Text("true".to_string()))
+                            .await
+                            .is_err()
+                        {
+                            // tx_done.send(());
+                        }
+                    } else {
+                        if socket
+                            .send(Message::Text("false".to_string()))
+                            .await
+                            .is_err()
+                        {
+                            // tx_done.send(());
+                        }
+                    }
+                }
+
+                }
+            }
+        }
+    });
+
+    tokio::select! {
+        to = (&mut timeout) => {
+            // stop the process word task, signal the client
+            // tx_done.send(()).unwrap();
+        }
+        pw = (&mut process_words) => {
+        // if client hangs up, cancel timeout
+        timeout.abort();
+        }
+    };
 }
