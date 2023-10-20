@@ -3,6 +3,7 @@ use std::{net::SocketAddr, time::Duration};
 use axum::extract::ws::{Message, WebSocket};
 use serde::Serialize;
 use serde_json;
+use tokio::time;
 use wordtwist::game::GameResults;
 
 use crate::game::Game;
@@ -26,12 +27,13 @@ pub async fn handle_socket_game(mut socket: WebSocket, _: SocketAddr, game: Game
         .await
         .is_ok();
 
-    let mut timeout = Box::pin(async { tokio::time::sleep(Duration::from_secs(GAME_TIME)).await });
-
     tokio::spawn(async move {
         let mut submitted_words = Vec::with_capacity(game.data.valid_words().len());
 
-        loop {
+        let timeout = time::sleep(Duration::from_secs(GAME_TIME));
+        tokio::pin!(timeout);
+
+        while !timeout.is_elapsed() {
             tokio::select! {
                 _ = &mut timeout => {
                     let _ = socket.send(Message::Text(serde_json::to_string(&SocketResponse::GameOver { results: game.data.score(submitted_words) }).unwrap())).await.is_err();
