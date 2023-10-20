@@ -97,18 +97,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
     if (daily) url = 'game/daily';
     else if (id !== '') url = `/game/id/${id}`;
     else url = `/game/${size}`;
-    const res = await fetch(url);
-    if (res.status !== 200) {
-      const errorMessage = await res.text();
-      setError(errorMessage);
-      if (errorTimeout.current) {
-        clearTimeout(errorTimeout.current);
-      }
-      errorTimeout.current = setTimeout(() => {
-        setError(null);
-      }, 5000);
-      return;
-    }
+    handleSocket(window.location.host + url);
   };
 
   const startTimer = () => {
@@ -131,7 +120,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
 
   const handleSocket = (url: string) => {
     if (socket.current !== null) throw new Error('already have a socket open');
-    socket.current = new WebSocket(url);
+    socket.current = new WebSocket('ws://' + url);
     socket.current.onmessage = (event) => {
       const msg: SocketResponse = JSON.parse(event.data);
       switch (msg.type) {
@@ -152,7 +141,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
           break;
         case 'guessResponse':
           if (msg.valid) {
-            setFoundWords([...foundWords, msg.word]);
+            setFoundWords((w) => [...w, msg.word]);
             setScore((s) => s + 2 ** msg.word.length);
           }
           break;
