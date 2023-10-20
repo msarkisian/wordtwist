@@ -13,6 +13,7 @@ use crate::{
 };
 
 #[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
 #[serde(tag = "type")]
 enum SocketResponse<'a> {
     GuessResponse { word: &'a str, valid: bool },

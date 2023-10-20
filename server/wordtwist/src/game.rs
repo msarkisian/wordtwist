@@ -18,6 +18,7 @@ enum GameDirections {
 }
 
 #[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct GameResults {
     pub found_words: Vec<String>,
     pub missed_words: Vec<String>,

@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Letter } from './Letter';
-import { GameData, GameGrid } from '../../@types';
+import { GameData, GameGrid, SocketResponse } from '../../@types';
 import { GameOptions } from './GameOptions';
 import { useLocalStorageState } from '../../hooks/useLocalStorageState';
 import { GameResults } from './GameResults';
@@ -146,26 +146,25 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
     if (socket.current !== null) throw new Error('already have a socket open');
     socket.current = new WebSocket(url);
     socket.current.onmessage = (event) => {
-      const msg = JSON.parse(event.data);
+      const msg: SocketResponse = JSON.parse(event.data);
+      switch (msg.type) {
+        case 'guessResponse':
+          if (msg.valid) {
+            setFoundWords([...foundWords, msg.word]);
+            setScore((s) => s + 2 ** msg.word.length);
+          }
+          break;
+        case 'gameOver':
+          clearInterval(timerIntervalRef.current);
+          setFoundWords(msg.foundWords);
+          setMissedWords(msg.missedWords);
+          socket.current = null;
+          setPostGame(true);
+          break;
+        default:
+          throw new Error('unexpected socket message: ' + msg);
+      }
     };
-  };
-
-  const postGameScore = async () => {
-    const url = `/game/score/${gameId}`;
-
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify({
-        score,
-        time: lastTime,
-      }),
-    });
-    if (res.status !== 201) {
-      throw new Error('Error posting score to server');
-    }
   };
 
   if (preGame) {

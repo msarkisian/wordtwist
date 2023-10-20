@@ -7,3 +7,18 @@ export type GameData = {
     valid_words: string[];
   };
 };
+
+export type SocketResponse = GuessReponse | GameResults;
+
+type GuessReponse = {
+  type: 'guessResponse';
+  word: string;
+  valid: boolean;
+};
+
+type GameResults = {
+  type: 'gameOver';
+  foundWords: string[];
+  missedWords: string[];
+  score: number;
+};
