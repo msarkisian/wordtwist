@@ -30,6 +30,7 @@ struct GetGameStatsDTO {
 // TODO parse out user and pass to `handle_socket_game`
 pub async fn get_new_game(
     Path(size): Path<usize>,
+    jar: SignedCookieJar,
     ws: WebSocketUpgrade,
     ConnectInfo(addr): ConnectInfo<SocketAddr>,
 ) -> impl IntoResponse {
@@ -40,34 +41,52 @@ pub async fn get_new_game(
         ))
         .into_response();
     }
-    ws.on_upgrade(move |socket| handle_socket_game(socket, addr, Game::new(size), None))
+    let user = get_uid_from_cookie(jar);
+    ws.on_upgrade(move |socket| handle_socket_game(socket, addr, Game::new(size), user))
         .into_response()
 }
 
-pub async fn get_existing_game_by_id(Path(id): Path<String>) -> impl IntoResponse {
+pub async fn get_existing_game_by_id(
+    Path(id): Path<String>,
+    jar: SignedCookieJar,
+    ws: WebSocketUpgrade,
+    ConnectInfo(addr): ConnectInfo<SocketAddr>,
+) -> impl IntoResponse {
     let conn = &mut open_db_connection();
     let id = match Uuid::parse_str(&id) {
         Ok(id) => id,
-        Err(_) => return Err((StatusCode::BAD_REQUEST, "Cannot parse provided id")),
+        Err(_) => {
+            return Err::<(), _>((StatusCode::BAD_REQUEST, "Cannot parse provided id"))
+                .into_response()
+        }
     };
     let game_data = match get_game_by_id(conn, id) {
         Ok(game) => game,
         Err(rusqlite::Error::QueryReturnedNoRows) => {
-            return Err((StatusCode::NOT_FOUND, "Game with specified ID not found"))
+            return Err::<(), _>((StatusCode::NOT_FOUND, "Game with specified ID not found"))
+                .into_response()
         }
         Err(_) => {
-            return Err((
+            return Err::<(), _>((
                 StatusCode::INTERNAL_SERVER_ERROR,
                 "Error fetching game from database",
             ))
+            .into_response()
         }
     };
-
-    Ok((StatusCode::OK, Json(Game::from(id, game_data))))
+    let user = get_uid_from_cookie(jar);
+    ws.on_upgrade(move |socket| handle_socket_game(socket, addr, Game::from(id, game_data), user))
+        .into_response()
 }
 
-pub async fn get_daily_game() -> impl IntoResponse {
-    (StatusCode::OK, Json(DailyGame::get().0))
+pub async fn get_daily_game(
+    jar: SignedCookieJar,
+    ws: WebSocketUpgrade,
+    ConnectInfo(addr): ConnectInfo<SocketAddr>,
+) -> impl IntoResponse {
+    let user = get_uid_from_cookie(jar);
+    let game = DailyGame::get().0;
+    ws.on_upgrade(move |socket| handle_socket_game(socket, addr, game, user))
 }
 
 pub async fn get_score(jar: SignedCookieJar, Path(game_id): Path<String>) -> impl IntoResponse {
