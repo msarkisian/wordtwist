@@ -4,9 +4,13 @@ use axum::extract::ws::{Message, WebSocket};
 use serde::Serialize;
 use serde_json;
 use tokio::time;
+use uuid::Uuid;
 use wordtwist::game::GameResults;
 
-use crate::game::Game;
+use crate::{
+    db::{game::add_game_score, open_db_connection, user::UserID},
+    game::Game,
+};
 
 #[derive(Serialize)]
 #[serde(tag = "type")]
@@ -15,7 +19,12 @@ enum SocketResponse<'a> {
     GameOver { results: GameResults },
 }
 
-pub async fn handle_socket_game(mut socket: WebSocket, _: SocketAddr, game: Game) {
+pub async fn handle_socket_game(
+    mut socket: WebSocket,
+    _: SocketAddr,
+    game: Game,
+    user: Option<UserID>,
+) {
     // TODO let client pass us their gametime
     const GAME_TIME: u64 = 120;
     // ignoring potential errors here, since if the client fails to establish the socket
@@ -36,7 +45,7 @@ pub async fn handle_socket_game(mut socket: WebSocket, _: SocketAddr, game: Game
         while !timeout.is_elapsed() {
             tokio::select! {
                 _ = &mut timeout => {
-                    let _ = socket.send(Message::Text(serde_json::to_string(&SocketResponse::GameOver { results: game.data.score(submitted_words) }).unwrap())).await.is_err();
+                    handle_end_game(socket, game, user, GAME_TIME, submitted_words).await;
                     break;
                 }
                 s = socket.recv() => {
@@ -62,4 +71,27 @@ pub async fn handle_socket_game(mut socket: WebSocket, _: SocketAddr, game: Game
             }
         }
     });
+}
+
+async fn handle_end_game(
+    mut socket: WebSocket,
+    game: Game,
+    user: Option<UserID>,
+    time: u64,
+    submitted_words: Vec<String>,
+) {
+    let game_id = Uuid::parse_str(&game.id).unwrap();
+    let results = game.data.score(submitted_words);
+    if user.is_some() {
+        let conn = &mut open_db_connection();
+        if add_game_score(conn, game_id, user.unwrap(), results.score, time as usize).is_err() {
+            eprintln!("failed to add game {game_id:?} to database (for user {user:?}")
+        }
+    }
+    let _ = socket
+        .send(Message::Text(
+            serde_json::to_string(&SocketResponse::GameOver { results }).unwrap(),
+        ))
+        .await
+        .is_err();
 }

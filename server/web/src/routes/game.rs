@@ -33,6 +33,7 @@ struct GetGameStatsDTO {
     max_time: usize,
 }
 
+// TODO parse out user and pass to `handle_socket_game`
 pub async fn get_new_game(
     Path(size): Path<usize>,
     ws: WebSocketUpgrade,
@@ -45,7 +46,7 @@ pub async fn get_new_game(
         ))
         .into_response();
     }
-    ws.on_upgrade(move |socket| handle_socket_game(socket, addr, Game::new(size)))
+    ws.on_upgrade(move |socket| handle_socket_game(socket, addr, Game::new(size), None))
         .into_response()
 }
 

@@ -19,9 +19,9 @@ enum GameDirections {
 
 #[derive(Serialize)]
 pub struct GameResults {
-    found_words: Vec<String>,
-    missed_words: Vec<String>,
-    score: usize,
+    pub found_words: Vec<String>,
+    pub missed_words: Vec<String>,
+    pub score: usize,
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
