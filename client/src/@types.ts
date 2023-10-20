@@ -18,9 +18,11 @@ type GuessReponse = {
 
 type GameResults = {
   type: 'gameOver';
-  foundWords: string[];
-  missedWords: string[];
-  score: number;
+  results: {
+    foundWords: string[];
+    missedWords: string[];
+    score: number;
+  };
 };
 
 type Setup = {

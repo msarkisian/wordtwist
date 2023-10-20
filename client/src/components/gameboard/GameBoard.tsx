@@ -147,8 +147,8 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
           break;
         case 'gameOver':
           clearInterval(timerIntervalRef.current);
-          setFoundWords(msg.foundWords);
-          setMissedWords(msg.missedWords);
+          setFoundWords(msg.results.foundWords);
+          setMissedWords(msg.results.missedWords);
           socket.current = null;
           setPostGame(true);
           break;
