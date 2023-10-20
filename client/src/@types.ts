@@ -8,7 +8,7 @@ export type GameData = {
   };
 };
 
-export type SocketResponse = GuessReponse | GameResults;
+export type SocketResponse = GuessReponse | GameResults | Setup;
 
 type GuessReponse = {
   type: 'guessResponse';
@@ -21,4 +21,9 @@ type GameResults = {
   foundWords: string[];
   missedWords: string[];
   score: number;
+};
+
+type Setup = {
+  type: 'setup';
+  game: GameData;
 };

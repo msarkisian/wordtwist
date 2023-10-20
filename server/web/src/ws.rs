@@ -18,6 +18,7 @@ use crate::{
 enum SocketResponse<'a> {
     GuessResponse { word: &'a str, valid: bool },
     GameOver { results: GameResults },
+    Setup { game: &'a Game },
 }
 
 pub async fn handle_socket_game(
@@ -32,7 +33,7 @@ pub async fn handle_socket_game(
     // there isn't anything we can do here anyway
     let _ = socket
         .send(axum::extract::ws::Message::Text(
-            serde_json::to_string(&game).unwrap(),
+            serde_json::to_string(&SocketResponse::Setup { game: &game }).unwrap(),
         ))
         .await
         .is_ok();

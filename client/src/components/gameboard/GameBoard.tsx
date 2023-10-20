@@ -109,19 +109,6 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
       }, 5000);
       return;
     }
-    const jsonRes: GameData = await res.json();
-    setGameId(jsonRes.id);
-    setGrid(jsonRes.data.grid);
-    setSelectedLetters(
-      Array(jsonRes.data.grid.length).fill(
-        Array(jsonRes.data.grid.length).fill(false)
-      )
-    );
-    if (daily) setRemainingTime(120);
-    else setRemainingTime(time);
-    setLastTime(time);
-    startTimer();
-    setPreGame(false);
   };
 
   const startTimer = () => {
@@ -148,6 +135,21 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
     socket.current.onmessage = (event) => {
       const msg: SocketResponse = JSON.parse(event.data);
       switch (msg.type) {
+        case 'setup':
+          setGameId(msg.game.id);
+          setGrid(msg.game.data.grid);
+          setSelectedLetters(
+            Array(msg.game.data.grid.length).fill(
+              Array(msg.game.data.grid.length).fill(false)
+            )
+          );
+          // TODO handle variable time
+          const time = 120;
+          setRemainingTime(time);
+          setLastTime(time);
+          startTimer();
+          setPreGame(false);
+          break;
         case 'guessResponse':
           if (msg.valid) {
             setFoundWords([...foundWords, msg.word]);
