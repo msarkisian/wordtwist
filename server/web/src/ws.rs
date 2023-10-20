@@ -85,6 +85,7 @@ async fn handle_end_game(
     if user.is_some() {
         let conn = &mut open_db_connection();
         if add_game_score(conn, game_id, user.unwrap(), results.score, time as usize).is_err() {
+            // TODO handle already existing score for user for game somehow
             eprintln!("failed to add game {game_id:?} to database (for user {user:?}")
         }
     }
