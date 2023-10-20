@@ -42,7 +42,7 @@ pub async fn handle_socket_game(
         let timeout = time::sleep(Duration::from_secs(GAME_TIME));
         tokio::pin!(timeout);
 
-        while !timeout.is_elapsed() {
+        loop {
             tokio::select! {
                 _ = &mut timeout => {
                     handle_end_game(socket, game, user, GAME_TIME, submitted_words).await;
