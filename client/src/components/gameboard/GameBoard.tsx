@@ -136,10 +136,8 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
               Array(msg.game.data.grid.length).fill(false)
             )
           );
-          // TODO handle variable time
-          const time = 120;
-          setRemainingTime(time);
-          setLastTime(time);
+          setRemainingTime(msg.time);
+          setLastTime(msg.time);
           startTimer();
           setPreGame(false);
           break;
