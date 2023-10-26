@@ -27,5 +27,6 @@ type GameResults = {
 
 type Setup = {
   type: 'setup';
+  time: number;
   game: GameData;
 };
