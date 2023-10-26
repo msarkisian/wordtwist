@@ -25,10 +25,9 @@ pub async fn handle_socket_game(
     mut socket: WebSocket,
     _: SocketAddr,
     game: Game,
+    time: u64,
     user: Option<UserID>,
 ) {
-    // TODO let client pass us their gametime
-    const GAME_TIME: u64 = 120;
     // ignoring potential errors here, since if the client fails to establish the socket
     // there isn't anything we can do here anyway
     let _ = socket
@@ -41,13 +40,13 @@ pub async fn handle_socket_game(
     tokio::spawn(async move {
         let mut submitted_words = Vec::with_capacity(game.data.valid_words().len());
 
-        let timeout = time::sleep(Duration::from_secs(GAME_TIME));
+        let timeout = time::sleep(Duration::from_secs(time));
         tokio::pin!(timeout);
 
         loop {
             tokio::select! {
                 _ = &mut timeout => {
-                    handle_end_game(socket, game, user, GAME_TIME, submitted_words).await;
+                    handle_end_game(socket, game, user, time, submitted_words).await;
                     break;
                 }
                 s = socket.recv() => {
