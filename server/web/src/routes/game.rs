@@ -28,20 +28,24 @@ struct GetGameStatsDTO {
 }
 
 #[derive(Deserialize)]
-pub struct GameTime(u64);
+pub struct GameTime {
+    time: u64,
+}
 
 impl GameTime {
     fn from_game_size(size: usize) -> Option<Self> {
         if !(3..=7).contains(&size) {
             return None;
         }
-        Some(GameTime((size as u64 - 1) * 60))
+        Some(GameTime {
+            time: (size as u64 - 2) * 60,
+        })
     }
 }
 
 impl Default for GameTime {
     fn default() -> Self {
-        GameTime(120)
+        GameTime { time: 120 }
     }
 }
 
@@ -61,7 +65,7 @@ pub async fn get_new_game(
     }
     let Query(time) = time.unwrap_or_else(|| Query(GameTime::from_game_size(size).unwrap()));
     let user = get_uid_from_cookie(jar);
-    ws.on_upgrade(move |socket| handle_socket_game(socket, addr, Game::new(size), time.0, user))
+    ws.on_upgrade(move |socket| handle_socket_game(socket, addr, Game::new(size), time.time, user))
         .into_response()
 }
 
@@ -98,7 +102,7 @@ pub async fn get_existing_game_by_id(
         time.unwrap_or_else(|| Query(GameTime::from_game_size(game_data.size()).unwrap()));
     let user = get_uid_from_cookie(jar);
     ws.on_upgrade(move |socket| {
-        handle_socket_game(socket, addr, Game::from(id, game_data), time.0, user)
+        handle_socket_game(socket, addr, Game::from(id, game_data), time.time, user)
     })
     .into_response()
 }
@@ -110,7 +114,9 @@ pub async fn get_daily_game(
 ) -> impl IntoResponse {
     let user = get_uid_from_cookie(jar);
     let game = DailyGame::get().0;
-    ws.on_upgrade(move |socket| handle_socket_game(socket, addr, game, GameTime::default().0, user))
+    ws.on_upgrade(move |socket| {
+        handle_socket_game(socket, addr, game, GameTime::default().time, user)
+    })
 }
 
 pub async fn get_score(jar: SignedCookieJar, Path(game_id): Path<String>) -> impl IntoResponse {
