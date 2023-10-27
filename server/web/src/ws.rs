@@ -1,6 +1,6 @@
-use std::{net::SocketAddr, time::Duration};
+use std::{borrow::Cow, net::SocketAddr, time::Duration};
 
-use axum::extract::ws::{Message, WebSocket};
+use axum::extract::ws::{close_code::NORMAL, Message, WebSocket};
 use serde::Serialize;
 use serde_json;
 use tokio::time;
@@ -96,4 +96,12 @@ async fn handle_end_game(
         ))
         .await
         .is_err();
+    let _ = socket
+        .send(Message::Close(Some({
+            axum::extract::ws::CloseFrame {
+                code: NORMAL,
+                reason: Cow::from("game over"),
+            }
+        })))
+        .await;
 }
