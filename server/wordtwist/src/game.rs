@@ -136,12 +136,13 @@ impl Game {
     }
 
     pub fn score(self, mut found_words: Vec<String>) -> GameResults {
-        found_words.sort_by(|a, b| a.len().cmp(&b.len()));
-        let missed_words = self
+        found_words.sort_by(|a, b| b.len().cmp(&a.len()));
+        let mut missed_words: Vec<String> = self
             .valid_words
             .into_iter()
             .filter(|w| !found_words.contains(w))
             .collect();
+        missed_words.sort_by(|a, b| b.len().cmp(&a.len()));
         GameResults {
             score: found_words
                 .iter()
