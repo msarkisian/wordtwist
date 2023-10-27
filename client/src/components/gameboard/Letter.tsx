@@ -20,9 +20,9 @@ export const Letter: React.FC<LetterProps> = ({
   return (
     <div
       className={`rounded-full h-24 w-24 flex justify-center items-center text-3xl cursor-pointer select-none border border-gray-800  ${
-        selected ? 'bg-yellow-400' : 'bg-indigo-400'
+        selected ? 'bg-indigo-300' : 'bg-yellow-200'
       }
-      ${isNewestLetter && 'bg-yellow-300'}
+      ${isNewestLetter && 'bg-indigo-400'}
       `}
       onMouseDown={handleMouseDown}
       onMouseOver={handleMouseOver}
