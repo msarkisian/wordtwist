@@ -98,7 +98,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
       ? new URLSearchParams({ time: time.toString() }).toString()
       : '';
 
-    if (daily) url = 'game/daily';
+    if (daily) url = '/game/daily';
     else if (id !== '') url = `/game/id/${id}?${queryString}`;
     else url = `/game/${size}?${queryString}`;
     handleSocket(window.location.host + url);
