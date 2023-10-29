@@ -2,10 +2,7 @@ export type GameGrid = string[][];
 
 export type GameData = {
   id: string;
-  data: {
-    grid: string[][];
-    valid_words: string[];
-  };
+  grid: string[][];
 };
 
 export type SocketResponse = GuessReponse | GameResults | Setup;

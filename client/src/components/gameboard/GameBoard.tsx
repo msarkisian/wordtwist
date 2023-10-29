@@ -130,10 +130,10 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
       switch (msg.type) {
         case 'setup':
           setGameId(msg.game.id);
-          setGrid(msg.game.data.grid);
+          setGrid(msg.game.grid);
           setSelectedLetters(
-            Array(msg.game.data.grid.length).fill(
-              Array(msg.game.data.grid.length).fill(false)
+            Array(msg.game.grid.length).fill(
+              Array(msg.game.grid.length).fill(false)
             )
           );
           setRemainingTime(msg.time);
