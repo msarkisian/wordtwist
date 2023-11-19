@@ -9,6 +9,9 @@ SQL_FILES = $(MIGRATIONS_DIR)/1_setup.sql \
 						$(MIGRATIONS_DIR)/6_game_size.sql \
 						$(MIGRATIONS_DIR)/7_score_unique_idx.sql \
 
+run_release: build_client $(COOKIE_KEY) $(DB)
+	cd server && cargo run --release 
+
 build_server: build_client $(COOKIE_KEY) $(DB)
 	cargo build --release --manifest-path server/Cargo.toml
 build_client: $(wildcard client/**/*)
