@@ -121,7 +121,7 @@ async fn handle_end_game(
                 // eprintln!("failed to add game {game_id:?} to database (for user {user:?}")
                 Some("Error adding game score to database")
             }
-            Ok(_) => None,
+            Ok(_) => Some("Score saved!"),
         }
     }
     let _ = socket

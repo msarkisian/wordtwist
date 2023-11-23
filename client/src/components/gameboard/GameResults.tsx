@@ -5,6 +5,7 @@ interface GameResultsProps {
   score: number;
   foundWords: string[];
   missedWords: string[];
+  endgameMessage: string | null;
   reset: () => void;
 }
 
@@ -13,6 +14,7 @@ export const GameResults: React.FC<GameResultsProps> = ({
   score,
   foundWords,
   missedWords,
+  endgameMessage,
   reset,
 }) => {
   const [copiedId, setCopiedId] = useState(false);
@@ -37,6 +39,7 @@ export const GameResults: React.FC<GameResultsProps> = ({
       >
         {copiedId ? <>ID copied!</> : <>Copy Game ID</>}
       </button>
+      <h3>{endgameMessage && endgameMessage}</h3>
       <p className="mt-4">Words in this puzzle:</p>
       <ul className="list-disc mx-6">
         {foundWords.map((word) => (

@@ -31,6 +31,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
   const [preGame, setPreGame] = useState(true);
   const [postGame, setPostGame] = useState(false);
   const [missedWords, setMissedWords] = useState<string[]>([]);
+  const [endgameMessage, setEndgameMessage] = useState<string | null>('');
 
   const socket = useRef<WebSocket | null>(null);
 
@@ -151,6 +152,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
           clearInterval(timerIntervalRef.current);
           setFoundWords(msg.results.foundWords);
           setMissedWords(msg.results.missedWords);
+          setEndgameMessage(msg.msg);
           socket.current = null;
           setPostGame(true);
           break;
@@ -179,6 +181,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
         foundWords={foundWords}
         score={score}
         missedWords={missedWords}
+        endgameMessage={endgameMessage}
         reset={reset}
       />
     );
