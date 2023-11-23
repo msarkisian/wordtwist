@@ -20,7 +20,7 @@ type GameResults = {
     missedWords: string[];
     score: number;
   };
-  err: String | null;
+  msg: String | null;
 };
 
 type Setup = {

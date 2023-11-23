@@ -22,7 +22,7 @@ enum SocketResponse<'a> {
     },
     GameOver {
         results: GameResults,
-        err: Option<&'a str>,
+        msg: Option<&'a str>,
     },
     Setup {
         time: u64,
@@ -126,7 +126,7 @@ async fn handle_end_game(
     }
     let _ = socket
         .send(Message::Text(
-            serde_json::to_string(&SocketResponse::GameOver { results, err }).unwrap(),
+            serde_json::to_string(&SocketResponse::GameOver { results, msg: err }).unwrap(),
         ))
         .await
         .is_err();
