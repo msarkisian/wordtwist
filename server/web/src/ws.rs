@@ -16,9 +16,18 @@ use crate::{
 #[serde(rename_all = "camelCase")]
 #[serde(tag = "type")]
 enum SocketResponse<'a> {
-    GuessResponse { word: &'a str, valid: bool },
-    GameOver { results: GameResults },
-    Setup { time: u64, game: GameSetupDTO<'a> },
+    GuessResponse {
+        word: &'a str,
+        valid: bool,
+    },
+    GameOver {
+        results: GameResults,
+        err: Option<&'a str>,
+    },
+    Setup {
+        time: u64,
+        game: GameSetupDTO<'a>,
+    },
 }
 
 #[derive(Serialize)]
@@ -96,23 +105,28 @@ async fn handle_end_game(
 ) {
     let game_id = Uuid::parse_str(&game.id).unwrap();
     let results = game.data.score(submitted_words);
+    let mut err = None;
     if user.is_some() {
         let conn = &mut open_db_connection();
-        match add_game_score(conn, game_id, user.unwrap(), results.score, time as usize) {
+        err = match add_game_score(conn, game_id, user.unwrap(), results.score, time as usize) {
             Err(rusqlite::Error::SqliteFailure(e, _)) => {
                 if e.code == rusqlite::ErrorCode::ConstraintViolation {
-                    eprintln!("user {user:?} has already been scored for game {game_id:?}")
+                    // eprintln!("user {user:?} has already been scored for game {game_id:?}")
+                    Some("You have already sumbitted a score for this game")
+                } else {
+                    Some("Error adding game score to database")
                 }
             }
             Err(_) => {
-                eprintln!("failed to add game {game_id:?} to database (for user {user:?}")
+                // eprintln!("failed to add game {game_id:?} to database (for user {user:?}")
+                Some("Error adding game score to database")
             }
-            Ok(_) => {}
+            Ok(_) => None,
         }
     }
     let _ = socket
         .send(Message::Text(
-            serde_json::to_string(&SocketResponse::GameOver { results }).unwrap(),
+            serde_json::to_string(&SocketResponse::GameOver { results, err }).unwrap(),
         ))
         .await
         .is_err();
