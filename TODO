@@ -1,7 +1,7 @@
 ## Frontend
- - Clean up register form
- - Refactor logic flow for login/register
- - Display error messages for failed socket connections
 
-## Backend 
- - Skip serialization of `valid_words` on ws (but not for db inserts)  
+- Clean up register form
+- Refactor logic flow for login/register
+- Display error messages for failed socket connections
+
+## Backend
