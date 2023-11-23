@@ -98,9 +98,16 @@ async fn handle_end_game(
     let results = game.data.score(submitted_words);
     if user.is_some() {
         let conn = &mut open_db_connection();
-        if add_game_score(conn, game_id, user.unwrap(), results.score, time as usize).is_err() {
-            // TODO handle already existing score for user for game somehow
-            eprintln!("failed to add game {game_id:?} to database (for user {user:?}")
+        match add_game_score(conn, game_id, user.unwrap(), results.score, time as usize) {
+            Err(rusqlite::Error::SqliteFailure(e, _)) => {
+                if e.code == rusqlite::ErrorCode::ConstraintViolation {
+                    eprintln!("user {user:?} has already been scored for game {game_id:?}")
+                }
+            }
+            Err(_) => {
+                eprintln!("failed to add game {game_id:?} to database (for user {user:?}")
+            }
+            Ok(_) => {}
         }
     }
     let _ = socket
