@@ -15,6 +15,8 @@ function App() {
   const [showRegister, setShowRegister] = useState(false);
   const [loginError, setLoginError] = useTimeoutState<string>(10000);
 
+  const [gameBoardKey, setGameBoardKey] = useState(0);
+
   const loginUrl = '/login';
   const registerUrl = '/user';
 
@@ -80,6 +82,7 @@ function App() {
   const goHome = () => {
     setShowRegister(false);
     setShowLogin(false);
+    setGameBoardKey((v) => v + 1);
   };
 
   useEffect(() => {
@@ -104,7 +107,7 @@ function App() {
             showRegister={showRegister}
           />
         ) : (
-          <GameBoard />
+          <GameBoard key={gameBoardKey} />
         )}
       </UserContext.Provider>
     </>
