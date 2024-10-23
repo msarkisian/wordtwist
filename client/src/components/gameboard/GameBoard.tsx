@@ -20,7 +20,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({}) => {
   const [foundWords, setFoundWords] = useState<string[]>([]);
   const [score, setScore] = useState(0);
   const [remainingTime, setRemainingTime] = useState<number>(lastTime);
-  const timerIntervalRef = useRef<number | undefined>(undefined);
+  const timerIntervalRef = useRef<Timer | undefined>(undefined);
   // not setting this to falses on initialization to account for different game sizes
   const [selectedLetters, setSelectedLetters] = useState<boolean[][] | null>(
     null
