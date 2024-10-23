@@ -38,8 +38,8 @@ impl Default for Game {
 }
 
 impl Game {
-    /// Creates a new `GeneratedGame` of `size` x `size`
-    pub fn new(size: usize) -> Self {
+    /// Creates a new `Game` of `size` x `size`, hiding `target_word` in the game.
+    pub fn from_target_word(size: usize, target_word: &str) -> Self {
         fn calculate_valid_directions(
             grid: &Vec<Vec<Option<char>>>,
             (y, x): &(usize, usize),
@@ -73,9 +73,6 @@ impl Game {
             }
             output
         }
-
-        let target_word_size = (2 * size..3 * size).choose(&mut thread_rng()).unwrap();
-        let target_word = get_random_n_length_word(target_word_size);
 
         let mut grid = 'outer: loop {
             let mut grid = vec![vec![None; size]; size];
@@ -117,6 +114,14 @@ impl Game {
             valid_words: generate_wordlist_from_game(&grid),
             grid,
         }
+    }
+
+    /// Creates a new `Game` of `size` x `size`
+    pub fn new(size: usize) -> Self {
+        let target_word_size = (2 * size..3 * size).choose(&mut thread_rng()).unwrap();
+        let target_word = get_random_n_length_word(target_word_size);
+
+        Game::from_target_word(size, &target_word)
     }
 
     pub fn size(&self) -> usize {
